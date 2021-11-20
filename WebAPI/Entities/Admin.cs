@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace WebAPI.Entities
 {
-    public enum RoleValue
+    public class Admin : User
     {
-        User = 0,
-        Promoter = 1,
-        Student = 2,
-        Admin = 3
+        
     }
 }

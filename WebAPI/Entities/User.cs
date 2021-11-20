@@ -6,16 +6,11 @@ using Microsoft.AspNetCore.Identity;
 
 namespace WebAPI.Entities
 {
-    public class User
+    public class User : IdentityUser<int>
     {
-        public int Id { get; set; }
-        public string Email { get; set; }
         public string FirstName{ get; set; }
         public string LastName{ get; set; }
         public DateTime RegistrationDate { get; set; }
-        public string PasswordHash { get; set; }
-        public int RoleId { get; set; }
-        public virtual Role Role { get; set; }
 
         /*        public string? Title { get; set; }
                 public string? IndexNumber { get; set; }*/

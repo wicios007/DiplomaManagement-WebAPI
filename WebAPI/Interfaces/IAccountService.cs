@@ -4,7 +4,10 @@ namespace WebAPI.Interfaces
 {
     public interface IAccountService
     {
-        void RegisterUser(RegisterUserDto dto);
-        string GenerateJwt(LoginUserDto dto);
+        public void LoginUser(LoginUserDto dto);
+
+        public void RegisterUser(RegisterUserDto dto);
+/*        void RegisterUser(RegisterUserDto dto);
+        string GenerateJwt(LoginUserDto dto);*/
     }
 }

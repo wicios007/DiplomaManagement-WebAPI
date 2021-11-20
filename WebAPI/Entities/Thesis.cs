@@ -14,10 +14,10 @@ namespace WebAPI.Entities
         public string Description { get; set; }
         public bool IsTaken { get; set; }
 
-        public int StudentId { get; set; }
+/*        public int StudentId { get; set; }
         public virtual Student Student { get; set; }
-        public int PromoterId { get; set; }
-        public virtual Promoter Promoter { get; set; }
+        public int? PromoterId { get; set; }
+        public virtual Promoter Promoter { get; set; }*/
         
 
 

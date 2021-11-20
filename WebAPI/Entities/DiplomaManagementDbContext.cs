@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace WebAPI.Entities
 {
-    public class DiplomaManagementDbContext : DbContext
+    public class DiplomaManagementDbContext : IdentityDbContext<User, Role, int>
     {
 
         public DiplomaManagementDbContext(DbContextOptions<DiplomaManagementDbContext> options) : base(options)
@@ -14,10 +16,6 @@ namespace WebAPI.Entities
             
         }
 
-        public DbSet<User> Users { get; set; }
-/*        public DbSet<Promoter> Promoters { get; set; }
-        public DbSet<Student> Students { get; set; }*/
-        public DbSet<Role> Roles{ get; set; }
         public DbSet<Thesis> Theses { get; set; }
         public DbSet<College> Colleges { get; set; }
         public DbSet<Department> Departments { get; set; }
@@ -25,12 +23,22 @@ namespace WebAPI.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>()
+/*            modelBuilder.Entity<User>()
                 .Property(u => u.Email)
                 .IsRequired();
             modelBuilder.Entity<Role>()
                 .Property(r => r.Name)
-                .IsRequired();
+                .IsRequired();*/
+
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>()
+                .ToTable("AspNetUsers")
+                .HasDiscriminator<int>("UserType")
+                .HasValue<User>((int) RoleValue.User)
+                .HasValue<Promoter>((int) RoleValue.Promoter)
+                .HasValue<Student>((int) RoleValue.Student)
+                .HasValue<Admin>((int) RoleValue.Admin);
+
             modelBuilder.Entity<Thesis>()
                 .Property(r => r.Name)
                 .IsRequired();
@@ -51,9 +59,6 @@ namespace WebAPI.Entities
                 .Property(r => r.Street)
                 .IsRequired()
                 .HasMaxLength(50);
-
-/*            modelBuilder.Entity<Promoter>();
-            modelBuilder.Entity<Student>();*/
 
 
         }

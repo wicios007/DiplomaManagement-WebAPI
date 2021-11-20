@@ -13,7 +13,7 @@ namespace WebAPI.Controllers
 {
     [Route("api/college")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class CollegeController : ControllerBase
     {
         private readonly ICollegeService _collegeService;

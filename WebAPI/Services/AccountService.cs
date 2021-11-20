@@ -4,10 +4,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WebAPI.Entities;
 using WebAPI.Exceptions;
@@ -16,9 +20,38 @@ using WebAPI.Models;
 
 namespace WebAPI.Services
 {
-    public class AccountService : IAccountService
+    public class AccountService// : IAccountService
     {
-        private readonly DiplomaManagementDbContext _context;
+/*        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly IOptions<JwtOptionsDto> _jwtOptions;
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
+
+        public AccountService(ILogger logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager)
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _jwtOptions = jwtOptions;
+            _signInManager = signInManager;
+            _userManager = userManager;
+        }
+
+        public void LoginUser(LoginUserDto dto)
+        {
+            var user = _userManager.FindByEmailAsync(dto.Email);
+            //var userRoles =  _userManager.GetRolesAsync(user)
+        }
+
+        public void RegisterUser(RegisterUserDto dto)
+        {
+            //var user = 
+        }*/
+        
+        
+        
+        
+        /*private readonly DiplomaManagementDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly AuthenticationSettings _authenticationSettings;
 
@@ -79,6 +112,6 @@ namespace WebAPI.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(token);
 
-        }
+        }*/
     }
 }
