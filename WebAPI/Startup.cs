@@ -46,6 +46,8 @@ namespace WebAPI
                 options.Password.RequiredLength = 8;
                 options.Password.RequiredUniqueChars = 0;
                 options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
 
             })
             .AddRoleManager<RoleManager<Role>>()
@@ -62,10 +64,6 @@ namespace WebAPI
             services.AddScoped<ICollegeService, CollegeService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IThesisService, ThesisService>();
-
-            /*           services.AddControllers().AddJsonOptions(x =>
-                           x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);*/
-
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
             services.AddScoped<IUserContextService, UserContextService>();
@@ -94,19 +92,23 @@ namespace WebAPI
             services.AddHttpContextAccessor();
             services.AddSwaggerGen();
 
-            /*
+            
+
              services.AddCors(options =>
             {
                 options.AddPolicy("DiplomaManagementClient", builder =>
                 {
-                    builder.AllowAnyMethod()
+                    //var origins = Configuration["AllowedOrigins"].Split(';');
+                    builder
+                        .AllowAnyMethod()
+                        .SetIsOriginAllowed(origin =>
+                            true) //tutaj pozwala na dostêp z ka¿dego linku, powinno byæ inaczej !!!
                         .AllowAnyHeader()
-                        .WithOrigins(Configuration["AllowedOrigins"]);
-
-
+                        .AllowCredentials();
+                    //.WithOrigins(Configuration["AllowedOrigins"]);
                 });
             });
-            */
+            
 
 
             services.AddDbContext<DiplomaManagementDbContext>(options =>
@@ -119,7 +121,7 @@ namespace WebAPI
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DiplomaManagementSeeder seeder)
         {
             app.UseStaticFiles();
-            //app.UseCors("DiplomaManagementClient");
+            app.UseCors("DiplomaManagementClient");
             seeder.Seed();
             if (env.IsDevelopment())
             {

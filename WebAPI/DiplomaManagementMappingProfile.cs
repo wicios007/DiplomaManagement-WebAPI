@@ -39,22 +39,14 @@ namespace WebAPI
             CreateMap<Thesis, ThesisDto>();
             CreateMap<ThesisDto, Thesis>();
 
-
-/*            CreateMap<RegisterUserDto, User>()
-                .ForMember(dest => dest.UserName, y => y.MapFrom(src => src.Email))
-                .ForMember(dest => dest.RegistrationDate, y => y.MapFrom(src => DateTime.Now));
-            CreateMap<RegisterUserDto, Student>()
-                .ForMember(dest => dest.UserName, y => y.MapFrom(src => src.Email))
-                .ForMember(dest => dest.RegistrationDate, y => y.MapFrom(src => DateTime.Now))
-                .ForMember(dest => dest.IndexNumber, y => y.MapFrom(src => src.StudentIndexNumber));
-            CreateMap<RegisterUserDto, Promoter>()
-                .ForMember(dest => dest.UserName, y => y.MapFrom(src => src.Email))
-                .ForMember(dest => dest.RegistrationDate, y => y.MapFrom(src => DateTime.Now))
-                .ForMember(dest => dest.Title, y => y.MapFrom(src => src.PromoterTitle));
-*/
-
-
-
+            CreateMap<User, UserDto>()
+                .ForMember(dest => dest.Email, y => y.MapFrom(src => src.Email))
+                .ForMember(dest => dest.FirstName, y => y.MapFrom(src => src.FirstName))
+                .ForMember(dest => dest.LastName, y => y.MapFrom(src => src.LastName));
+            CreateMap<UserDto, User>()
+                .ForMember(dest => dest.Email, y => y.MapFrom(src => src.Email))
+                .ForMember(dest => dest.FirstName, y => y.MapFrom(src => src.FirstName))
+                .ForMember(dest => dest.LastName, y => y.MapFrom(src => src.LastName));
         }
         
     }

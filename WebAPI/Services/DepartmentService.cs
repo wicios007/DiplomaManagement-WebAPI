@@ -21,7 +21,6 @@ namespace WebAPI.Services
         private readonly DiplomaManagementDbContext _dbContext;
         private readonly IMapper _mapper;
 
-
         public DepartmentService(DiplomaManagementDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
@@ -42,7 +41,7 @@ namespace WebAPI.Services
             var college = GetCollegeById(collegeId);
             var departmentEntity = _mapper.Map<Department>(dto);
 
-            departmentEntity.CollegeId = collegeId;
+            departmentEntity.CollegeId = collegeId; //college.Id 
             departmentEntity.Initials = GetInitials(dto.Name);
 
             _dbContext.Departments.Add(departmentEntity);

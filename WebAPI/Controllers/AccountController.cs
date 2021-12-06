@@ -32,15 +32,16 @@ namespace WebAPI.Controllers
         private readonly JwtOptionsDto _jwtOptions;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
 
-
-        public AccountController(ILogger<AccountController> logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager)
+        public AccountController(ILogger<AccountController> logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _logger = logger;
             _mapper = mapper;
             _jwtOptions = jwtOptions?.Value;
             _signInManager = signInManager;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
         [Authorize(Roles = "Admin")]
         [HttpPost("register")]
@@ -148,7 +149,7 @@ namespace WebAPI.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
-                return BadRequest("Error occurred");
+                return BadRequest($"Error occurred");
             }
 
         }
@@ -167,7 +168,7 @@ namespace WebAPI.Controllers
                 if (!result.Succeeded)
                 {
                     _logger.LogInformation($"Invalid email {dto.Email} or password {dto.Password}");
-                    return BadRequest("Invalid credentials");
+                    return BadRequest("Niepoprawne dane logowania");
                 }
 
                 var user = await _userManager.FindByEmailAsync(dto.Email);
@@ -183,6 +184,7 @@ namespace WebAPI.Controllers
                                   new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds)).ToString()),
                 };
                 claims.AddRange(userRoles.Select(ur => new Claim(ClaimTypes.Role, ur)));
+                var role = userRoles.Select(ur => new Claim(ClaimTypes.Role, ur)).Select(u => u.Value);
 
                 var token = new JwtSecurityToken(
                     new JwtHeader(new SigningCredentials(
@@ -192,8 +194,8 @@ namespace WebAPI.Controllers
                 var response = new
                 {
                     access_token = encodedJwt,
-                    expires_in = token.ValidTo.ToString("yyyy-MM-ddTHH:mm:ss")
-                    //user_role = claims[claims.Count-1].ToString()
+                    expires_in = token.ValidTo.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    user_role = role.First()
                 };
                 return Ok(response);
             }
@@ -202,6 +204,22 @@ namespace WebAPI.Controllers
                 _logger.LogError(e, e.Message);
                 return BadRequest("Error occurred");
             }
+        }
+        [HttpGet("users")]
+        public List<UserDto> GetUsers(){
+            var users = _userManager
+                .Users
+                .ToList();
+            
+            var result = _mapper.Map<List<UserDto>>(users);            
+            return result;
+        }
+
+        [HttpGet("roles")]
+        public List<Role> GetRoles()
+        {
+            var roles = _roleManager.Roles.ToList();
+            return roles;
         }
     }
 }

@@ -10,6 +10,7 @@ namespace WebAPI.Entities
     {
         public string IndexNumber{ get; set; }
         public virtual Thesis Thesis { get; set; }
+        public List<ProposedTheses> ProposedThesesList { get; set; }
         
     }
 }

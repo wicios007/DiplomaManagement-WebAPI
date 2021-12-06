@@ -23,13 +23,6 @@ namespace WebAPI.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-/*            modelBuilder.Entity<User>()
-                .Property(u => u.Email)
-                .IsRequired();
-            modelBuilder.Entity<Role>()
-                .Property(r => r.Name)
-                .IsRequired();*/
-
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<User>()
                 .ToTable("AspNetUsers")
