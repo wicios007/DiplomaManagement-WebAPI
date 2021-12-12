@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Entities;
 
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(DiplomaManagementDbContext))]
-    partial class DiplomaManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211212111120_AddedCollegeAndDepartmentInStudentAndPromoterEntities")]
+    partial class AddedCollegeAndDepartmentInStudentAndPromoterEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,12 +122,63 @@ namespace WebAPI.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("WebAPI.Entities.Address", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Address");
+                });
+
+            modelBuilder.Entity("WebAPI.Entities.College", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId")
+                        .IsUnique();
+
+                    b.ToTable("Colleges");
+                });
+
             modelBuilder.Entity("WebAPI.Entities.Department", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CollegeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Initials")
                         .HasColumnType("nvarchar(max)");
@@ -136,6 +189,8 @@ namespace WebAPI.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CollegeId");
 
                     b.ToTable("Departments");
                 });
@@ -293,9 +348,6 @@ namespace WebAPI.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -367,8 +419,6 @@ namespace WebAPI.Migrations
                 {
                     b.HasBaseType("WebAPI.Entities.User");
 
-                    b.HasIndex("DepartmentId");
-
                     b.HasDiscriminator().HasValue(3);
                 });
 
@@ -376,8 +426,18 @@ namespace WebAPI.Migrations
                 {
                     b.HasBaseType("WebAPI.Entities.User");
 
+                    b.Property<int?>("CollegeId")
+                        .HasColumnType("int")
+                        .HasColumnName("Promoter_CollegeId");
+
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int")
+                        .HasColumnName("Promoter_DepartmentId");
+
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
+
+                    b.HasIndex("CollegeId");
 
                     b.HasIndex("DepartmentId");
 
@@ -388,8 +448,16 @@ namespace WebAPI.Migrations
                 {
                     b.HasBaseType("WebAPI.Entities.User");
 
+                    b.Property<int?>("CollegeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("IndexNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.HasIndex("CollegeId");
 
                     b.HasIndex("DepartmentId");
 
@@ -447,17 +515,37 @@ namespace WebAPI.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WebAPI.Entities.College", b =>
+                {
+                    b.HasOne("WebAPI.Entities.Address", "Address")
+                        .WithOne("College")
+                        .HasForeignKey("WebAPI.Entities.College", "AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+                });
+
+            modelBuilder.Entity("WebAPI.Entities.Department", b =>
+                {
+                    b.HasOne("WebAPI.Entities.College", "College")
+                        .WithMany("Departments")
+                        .HasForeignKey("CollegeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("College");
+                });
+
             modelBuilder.Entity("WebAPI.Entities.ProposedThese", b =>
                 {
-                    b.HasOne("WebAPI.Entities.Department", "Department")
+                    b.HasOne("WebAPI.Entities.Department", null)
                         .WithMany("ProposedTheses")
                         .HasForeignKey("DepartmentId");
 
                     b.HasOne("WebAPI.Entities.Student", "Student")
                         .WithMany("ProposedThesesList")
                         .HasForeignKey("StudentId");
-
-                    b.Navigation("Department");
 
                     b.Navigation("Student");
                 });
@@ -487,7 +575,7 @@ namespace WebAPI.Migrations
 
             modelBuilder.Entity("WebAPI.Entities.Thesis", b =>
                 {
-                    b.HasOne("WebAPI.Entities.Department", "Department")
+                    b.HasOne("WebAPI.Entities.Department", null)
                         .WithMany("Theses")
                         .HasForeignKey("DepartmentId");
 
@@ -499,38 +587,49 @@ namespace WebAPI.Migrations
                         .WithOne("Thesis")
                         .HasForeignKey("WebAPI.Entities.Thesis", "StudentId");
 
-                    b.Navigation("Department");
-
                     b.Navigation("Promoter");
 
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("WebAPI.Entities.Admin", b =>
-                {
-                    b.HasOne("WebAPI.Entities.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId");
-
-                    b.Navigation("Department");
-                });
-
             modelBuilder.Entity("WebAPI.Entities.Promoter", b =>
                 {
+                    b.HasOne("WebAPI.Entities.College", "College")
+                        .WithMany()
+                        .HasForeignKey("CollegeId");
+
                     b.HasOne("WebAPI.Entities.Department", "Department")
                         .WithMany("Promoters")
                         .HasForeignKey("DepartmentId");
+
+                    b.Navigation("College");
 
                     b.Navigation("Department");
                 });
 
             modelBuilder.Entity("WebAPI.Entities.Student", b =>
                 {
+                    b.HasOne("WebAPI.Entities.College", "College")
+                        .WithMany()
+                        .HasForeignKey("CollegeId");
+
                     b.HasOne("WebAPI.Entities.Department", "Department")
                         .WithMany("Students")
                         .HasForeignKey("DepartmentId");
 
+                    b.Navigation("College");
+
                     b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("WebAPI.Entities.Address", b =>
+                {
+                    b.Navigation("College");
+                });
+
+            modelBuilder.Entity("WebAPI.Entities.College", b =>
+                {
+                    b.Navigation("Departments");
                 });
 
             modelBuilder.Entity("WebAPI.Entities.Department", b =>

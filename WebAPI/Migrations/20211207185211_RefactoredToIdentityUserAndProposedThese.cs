@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WebAPI.Migrations
 {
-    public partial class RefactorToIdentityUser : Migration
+    public partial class RefactoredToIdentityUserAndProposedThese : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -35,12 +35,20 @@ namespace WebAPI.Migrations
                 name: "IX_Users_RoleId",
                 table: "Users");
 
+            migrationBuilder.DropIndex(
+                name: "IX_Users_ThesisId",
+                table: "Users");
+
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Roles",
                 table: "Roles");
 
             migrationBuilder.DropColumn(
                 name: "Discriminator",
+                table: "Users");
+
+            migrationBuilder.DropColumn(
+                name: "ThesisId",
                 table: "Users");
 
             migrationBuilder.RenameTable(
@@ -57,11 +65,6 @@ namespace WebAPI.Migrations
                 newName: "UserType");
 
             migrationBuilder.RenameIndex(
-                name: "IX_Users_ThesisId",
-                table: "AspNetUsers",
-                newName: "IX_AspNetUsers_ThesisId");
-
-            migrationBuilder.RenameIndex(
                 name: "IX_Users_Promoter_DepartmentId",
                 table: "AspNetUsers",
                 newName: "IX_AspNetUsers_Promoter_DepartmentId");
@@ -70,6 +73,12 @@ namespace WebAPI.Migrations
                 name: "IX_Users_DepartmentId",
                 table: "AspNetUsers",
                 newName: "IX_AspNetUsers_DepartmentId");
+
+            migrationBuilder.AddColumn<int>(
+                name: "StudentId",
+                table: "Theses",
+                type: "int",
+                nullable: true);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Email",
@@ -305,6 +314,69 @@ namespace WebAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ProposedTheses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsAccepted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProposedTheses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProposedTheses_AspNetUsers_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProposedTheseComments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProposedTheseId = table.Column<int>(type: "int", nullable: false),
+                    PromoterId = table.Column<int>(type: "int", nullable: true),
+                    StudentId = table.Column<int>(type: "int", nullable: true),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProposedTheseComments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProposedTheseComments_AspNetUsers_PromoterId",
+                        column: x => x.PromoterId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProposedTheseComments_AspNetUsers_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProposedTheseComments_ProposedTheses_ProposedTheseId",
+                        column: x => x.ProposedTheseId,
+                        principalTable: "ProposedTheses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Theses_StudentId",
+                table: "Theses",
+                column: "StudentId",
+                unique: true,
+                filter: "[StudentId] IS NOT NULL");
+
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
                 table: "AspNetUsers",
@@ -344,6 +416,26 @@ namespace WebAPI.Migrations
                 table: "AspNetUserRoles",
                 column: "RoleId");
 
+            migrationBuilder.CreateIndex(
+                name: "IX_ProposedTheseComments_PromoterId",
+                table: "ProposedTheseComments",
+                column: "PromoterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProposedTheseComments_ProposedTheseId",
+                table: "ProposedTheseComments",
+                column: "ProposedTheseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProposedTheseComments_StudentId",
+                table: "ProposedTheseComments",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProposedTheses_StudentId",
+                table: "ProposedTheses",
+                column: "StudentId");
+
             migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUsers_Departments_DepartmentId",
                 table: "AspNetUsers",
@@ -361,17 +453,17 @@ namespace WebAPI.Migrations
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUsers_Theses_ThesisId",
-                table: "AspNetUsers",
-                column: "ThesisId",
-                principalTable: "Theses",
+                name: "FK_Theses_AspNetUsers_PromoterId",
+                table: "Theses",
+                column: "PromoterId",
+                principalTable: "AspNetUsers",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Theses_AspNetUsers_PromoterId",
+                name: "FK_Theses_AspNetUsers_StudentId",
                 table: "Theses",
-                column: "PromoterId",
+                column: "StudentId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
@@ -388,11 +480,11 @@ namespace WebAPI.Migrations
                 table: "AspNetUsers");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_AspNetUsers_Theses_ThesisId",
-                table: "AspNetUsers");
+                name: "FK_Theses_AspNetUsers_PromoterId",
+                table: "Theses");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Theses_AspNetUsers_PromoterId",
+                name: "FK_Theses_AspNetUsers_StudentId",
                 table: "Theses");
 
             migrationBuilder.DropTable(
@@ -409,6 +501,16 @@ namespace WebAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "ProposedTheseComments");
+
+            migrationBuilder.DropTable(
+                name: "ProposedTheses");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Theses_StudentId",
+                table: "Theses");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_AspNetUsers",
@@ -429,6 +531,10 @@ namespace WebAPI.Migrations
             migrationBuilder.DropIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles");
+
+            migrationBuilder.DropColumn(
+                name: "StudentId",
+                table: "Theses");
 
             migrationBuilder.DropColumn(
                 name: "AccessFailedCount",
@@ -504,11 +610,6 @@ namespace WebAPI.Migrations
                 newName: "RoleId");
 
             migrationBuilder.RenameIndex(
-                name: "IX_AspNetUsers_ThesisId",
-                table: "Users",
-                newName: "IX_Users_ThesisId");
-
-            migrationBuilder.RenameIndex(
                 name: "IX_AspNetUsers_Promoter_DepartmentId",
                 table: "Users",
                 newName: "IX_Users_Promoter_DepartmentId");
@@ -536,6 +637,12 @@ namespace WebAPI.Migrations
                 nullable: false,
                 defaultValue: "");
 
+            migrationBuilder.AddColumn<int>(
+                name: "ThesisId",
+                table: "Users",
+                type: "int",
+                nullable: true);
+
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
                 table: "Roles",
@@ -561,6 +668,11 @@ namespace WebAPI.Migrations
                 name: "IX_Users_RoleId",
                 table: "Users",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_ThesisId",
+                table: "Users",
+                column: "ThesisId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Theses_Users_PromoterId",

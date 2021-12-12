@@ -9,8 +9,12 @@ namespace WebAPI.Entities
     public class Student : User
     {
         public string IndexNumber{ get; set; }
+/*        public int? DepartmentId{get;set;}
+        public virtual Department Department{get;set;}*/
+        
+        //public int ThesisId{get;set;}
         public virtual Thesis Thesis { get; set; }
-        public List<ProposedTheses> ProposedThesesList { get; set; }
+        public List<ProposedThese> ProposedThesesList { get; set; }
         
     }
 }

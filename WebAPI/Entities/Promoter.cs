@@ -9,6 +9,8 @@ namespace WebAPI.Entities
     public class Promoter : User
     {
         public string Title { get; set; }
+/*        public int? DepartmentId{get;set;}
+        public virtual Department Department{get;set;}*/
         public List<Thesis> Theses { get; set; }
 
     }

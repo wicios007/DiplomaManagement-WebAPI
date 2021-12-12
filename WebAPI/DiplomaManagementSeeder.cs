@@ -38,16 +38,15 @@ namespace WebAPI
                         _dbContext.Theses.AddRange(theses);
                         _dbContext.SaveChanges();
                     }
-
-                    if (!_dbContext.Colleges.Any())
+                    if (!_dbContext.ProposedTheses.Any())
                     {
-                        IEnumerable<College> colleges = GetColleges();
-                        _dbContext.Colleges.AddRange(colleges);
+                        IEnumerable<ProposedThese> propTheses = GetProposedTheses();
+                        _dbContext.ProposedTheses.AddRange(propTheses);
                         _dbContext.SaveChanges();
                     }
 
                 }
-                //SeedRoles();
+                SeedRoles();
                 SeedAdmin();
 
             }
@@ -122,6 +121,29 @@ namespace WebAPI
             }
         }
 
+        private static IEnumerable<ProposedThese> GetProposedTheses()
+        {
+            var propTheses = new List<ProposedThese>()
+            {
+                new ProposedThese()
+                {
+                    Name = "Aplikacja do zarządzania pracami dyplomowymi",
+                    NameEnglish = "Application for theses management",
+                    Description = "Stworzenie aplikacji do zarządzania pracami dyplomowymi z użyciem frameworków .NET 5.0 oraz Angular",
+                    IsAccepted = false
+                },
+                new ProposedThese()
+                {
+                    Name = "Projekt sieci",
+                    NameEnglish = "Sample",
+                    Description =
+                        "SAMPLE Stworzenie projektu sieci",
+                    IsAccepted = false
+                }
+            };
+            return propTheses;
+        }
+
         private static IEnumerable<Thesis> GetTheses()
         {
             var theses = new List<Thesis>()
@@ -145,42 +167,6 @@ namespace WebAPI
 
             };
             return theses;
-        }
-
-        private static IEnumerable<College> GetColleges()
-        {
-            var colleges = new List<College>()
-            {
-                new College()
-                {
-                    Name = "Politechnika Częstochowska",
-                    Address = new Address()
-                    {
-                        City = "Częstochowa",
-                        Street = "Generała Jana Henryka Dąbrowskiego 69",
-                        PostalCode = "42-201"
-                    },
-                    Departments = new List<Department>()
-                    {
-                        new Department()
-                        {
-                            Name = "Wydział Inżynierii Mechanicznej i Informatyki",
-                            Initials = "WIMII"
-                        },
-                        new Department()
-                        {
-                            Name = "Wydział Zarządzania",
-                            Initials = "WZ"
-                        },
-                        new Department()
-                        {
-                            Name = "Wydział Budownictwa",
-                            Initials = "WB"
-                        }
-                    }
-                }
-            };
-            return colleges;
         }
 
         

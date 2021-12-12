@@ -17,8 +17,9 @@ namespace WebAPI.Entities
         }
 
         public DbSet<Thesis> Theses { get; set; }
-        public DbSet<College> Colleges { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<ProposedThese> ProposedTheses{get;set;}
+        public DbSet<ProposedTheseComment> ProposedTheseComments{get;set;}
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,24 +36,18 @@ namespace WebAPI.Entities
             modelBuilder.Entity<Thesis>()
                 .Property(r => r.Name)
                 .IsRequired();
-            modelBuilder.Entity<College>()
+
+            modelBuilder.Entity<ProposedThese>()
                 .Property(r => r.Name)
-                .IsRequired()
-                .HasMaxLength(50);
+                .IsRequired();
+                
+            modelBuilder.Entity<ProposedTheseComment>();
+                
+
             modelBuilder.Entity<Department>()
                 .Property(r => r.Name)
                 .IsRequired()
                 .HasMaxLength(50);
-
-            modelBuilder.Entity<Address>()
-                .Property(r => r.City)
-                .IsRequired()
-                .HasMaxLength(50);
-            modelBuilder.Entity<Address>()
-                .Property(r => r.Street)
-                .IsRequired()
-                .HasMaxLength(50);
-
 
         }
 

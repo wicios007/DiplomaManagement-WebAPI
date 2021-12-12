@@ -10,7 +10,7 @@ using WebAPI.Interfaces;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/college/{collegeId}/department")]
+    [Route("api/department")]
     [ApiController]
    // [Authorize]
     public class DepartmentController : ControllerBase
@@ -22,45 +22,45 @@ namespace WebAPI.Controllers
             _departmentService = departmentService;
         }
         [HttpGet]
-        public ActionResult<List<DepartmentDto>> GetAll([FromRoute] int collegeId)
+        public ActionResult<List<DepartmentDto>> GetAll()
         {
-            var departments = _departmentService.GetAll(collegeId);
+            var departments = _departmentService.GetAll();
 
             return Ok(departments);
         }
 
         [HttpGet("{departmentId}")]
-        public ActionResult<DepartmentDto> Get([FromRoute] int collegeId, [FromRoute] int departmentId)
+        public ActionResult<DepartmentDto> Get([FromRoute] int departmentId)
         {
-            var department = _departmentService.GetById(collegeId, departmentId);
+            var department = _departmentService.GetById(departmentId);
             return Ok(department);
         }
         [HttpDelete("{departmentId}")]
-        public ActionResult Delete([FromRoute] int collegeId, [FromRoute] int departmentId)
+        public ActionResult Delete([FromRoute] int departmentId)
         {
-            _departmentService.Delete(collegeId, departmentId);
+            _departmentService.Delete(departmentId);
             return NoContent();
         }
 
         [HttpDelete]
-        public ActionResult DeleteAll([FromRoute] int collegeId)
+        public ActionResult DeleteAll()
         {
-            _departmentService.DeleteAll(collegeId);
+            _departmentService.DeleteAll();
             return NoContent();
         }
 
         [HttpPost]
-        public ActionResult Post([FromRoute] int collegeId, [FromBody] CreateDepartmentDto dto)
+        public ActionResult Post([FromBody] CreateDepartmentDto dto)
         {
-            var newDepartmentId = _departmentService.Create(collegeId, dto);
+            var newDepartmentId = _departmentService.Create(dto);
 
-            return Created($"api/college/{collegeId}/department/{newDepartmentId}", null);
+            return Created($"api/department/{newDepartmentId}", null);
         }
 
         [HttpPut("{departmentId}")]
-        public ActionResult Put([FromRoute] int collegeId, [FromRoute] int departmentId, [FromBody] UpdateDepartmentDto dto)
+        public ActionResult Put([FromRoute] int departmentId, [FromBody] UpdateDepartmentDto dto)
         {
-            _departmentService.Update(collegeId, departmentId, dto);
+            _departmentService.Update(departmentId, dto);
             return Ok();
         }
 

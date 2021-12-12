@@ -27,21 +27,19 @@ namespace WebAPI.Services
             _mapper = mapper;
         }
 
-        public List<DepartmentDto> GetAll(int collegeId)
+        public List<DepartmentDto> GetAll()
         {
-            var college = GetCollegeById(collegeId);
-            var departmentDtos = _mapper.Map<List<DepartmentDto>>(college.Departments);
+            var departments = _dbContext.Departments.ToList();
+            var departmentDtos = _mapper.Map<List<DepartmentDto>>(departments);
 
             return departmentDtos;
 
         }
 
-        public int Create(int collegeId, CreateDepartmentDto dto)
+        public int Create(CreateDepartmentDto dto)
         {
-            var college = GetCollegeById(collegeId);
             var departmentEntity = _mapper.Map<Department>(dto);
 
-            departmentEntity.CollegeId = collegeId; //college.Id 
             departmentEntity.Initials = GetInitials(dto.Name);
 
             _dbContext.Departments.Add(departmentEntity);
@@ -50,15 +48,13 @@ namespace WebAPI.Services
             return departmentEntity.Id;
         }
 
-        public void Delete(int collegeId, int departmentId)
+        public void Delete(int departmentId)
         {
-            var college = GetCollegeById(collegeId);
-
             var department = _dbContext
                 .Departments
                 .SingleOrDefault(c => c.Id == departmentId);
 
-            if (department == null || department.CollegeId != collegeId)
+            if (department == null)
             {
                 throw new NotFoundException("Department not found");
             }
@@ -67,21 +63,20 @@ namespace WebAPI.Services
             _dbContext.SaveChanges();
         }
 
-        public void DeleteAll(int collegeId)
+        public void DeleteAll()
         {
-            var college = GetCollegeById(collegeId);
+            var departments = _dbContext.Departments.ToList();
 
-            _dbContext.RemoveRange(college.Departments);
+            _dbContext.RemoveRange(departments);
             _dbContext.SaveChanges();
         }
 
-        public void Update(int collegeId, int departmentId, UpdateDepartmentDto dto)
+        public void Update(int departmentId, UpdateDepartmentDto dto)
         {
-            var college = GetCollegeById(collegeId);
             var department = _dbContext
                 .Departments
                 .SingleOrDefault(c => c.Id == departmentId);
-            if(department == null || department.CollegeId != collegeId)
+            if(department == null)
             {
                 throw new NotFoundException("Department not found");
             }
@@ -94,31 +89,16 @@ namespace WebAPI.Services
         }
 
 
-        public DepartmentDto GetById(int collegeId, int departmentId)
+        public DepartmentDto GetById(int departmentId)
         {
-            var college = GetCollegeById(collegeId);
             var department = _dbContext
                 .Departments
                 .FirstOrDefault(d => d.Id == departmentId);
-            if (department == null || department.CollegeId != collegeId)
+            if (department == null)
                 throw new NotFoundException("Department not found");
 
             var departmentDto = _mapper.Map<DepartmentDto>(department);
             return departmentDto;
-        }
-
-        private College GetCollegeById(int collegeId)
-        {
-            var college = _dbContext
-                .Colleges
-                .Include(c => c.Departments)
-                .FirstOrDefault(c => c.Id == collegeId);
-
-            if(college == null)
-            {
-                throw new NotFoundException("College not found");
-            }
-            return college;
         }
 
         private static string GetInitials(string name)

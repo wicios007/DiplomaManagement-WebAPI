@@ -12,8 +12,7 @@ namespace WebAPI.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Initials { get; set; }
-        public int CollegeId { get; set; }
-        public List<Promoter> Promoters { get; set; }
-        public List<Student> Students { get; set; }
+        public List<PromoterDto> Promoters { get; set; }
+        public List<StudentDto> Students { get; set; }
     }
 }

@@ -23,18 +23,22 @@ namespace WebAPI.Services
             _mapper = mapper;
         }
 
-        public List<ThesisDto> GetAll(int collegeId, int departmentId)
+        public List<ThesisDto> GetAll(int departmentId)
         {
-            var departments = GetDepartmentById(collegeId, departmentId);
+            var departments = GetDepartmentById(departmentId);
+            if (departments == null)
+            {
+                throw new NotFoundException("Department not found");
+            }
 
             var listOfTheses = _mapper.Map<List<ThesisDto>>(departments.Theses);
 
             return listOfTheses;
         }
 
-        public ThesisDto GetById(int collegeId, int departmentId, int thesisId)
+        public ThesisDto GetById(int departmentId, int thesisId)
         {
-            var departments = GetDepartmentById(collegeId, departmentId);
+            var departments = GetDepartmentById(departmentId);
 
             var thesis = _dbContext
                 .Theses
@@ -46,10 +50,13 @@ namespace WebAPI.Services
 
         }
 
-        public int Create(int collegeId, int departmentId, ThesisDto dto)
+        public int Create(int departmentId, ThesisDto dto)
         {
-            var department = GetDepartmentById(collegeId, departmentId);
-
+            var department = GetDepartmentById(departmentId);
+            if(department == null)
+            {
+                throw new NotFoundException("department not found");
+            }
             var departmentEntity = _mapper.Map<Thesis>(dto);
 
             _dbContext.Theses.Add(departmentEntity);
@@ -59,13 +66,13 @@ namespace WebAPI.Services
 
         }
 
-        public void Update(int collegeId, int departmentId, int thesisId, ThesisDto dto)
+        public void Update(int departmentId, int thesisId, ThesisDto dto)
         {
-            var department = GetDepartmentById(collegeId, departmentId);
+            var department = GetDepartmentById(departmentId);
 
-            if (department == null || department.CollegeId != collegeId || department.Id != departmentId)
+            if (department == null || department.Id != departmentId)
             {
-                throw new NotFoundException("College or department not found");
+                throw new NotFoundException("Department not found");
             }
 
             var thesis = _dbContext
@@ -84,11 +91,11 @@ namespace WebAPI.Services
             _dbContext.SaveChanges();
         }
 
-        public void Delete(int collegeId, int departmentId, int thesisId)
+        public void Delete(int departmentId, int thesisId)
         {
-            var department = GetDepartmentById(collegeId, departmentId);
+            var department = GetDepartmentById(departmentId);
 
-            if (department == null || department.CollegeId != collegeId || department.Id != departmentId)
+            if (department == null || department.Id != departmentId)
             {
                 throw new NotFoundException("College or department not found");
             }
@@ -102,11 +109,11 @@ namespace WebAPI.Services
 
         }
 
-        public void DeleteAll(int collegeId, int departmentId)
+        public void DeleteAll(int departmentId)
         {
-            var department = GetDepartmentById(collegeId, departmentId);
+            var department = GetDepartmentById(departmentId);
 
-            if (department == null || department.CollegeId != collegeId || department.Id != departmentId)
+            if (department == null || department.Id != departmentId)
             {
                 throw new NotFoundException("College or department not found");
             }
@@ -116,26 +123,15 @@ namespace WebAPI.Services
         }
 
 
-
-        private College GetCollegeById(int collegeId)
+        private Department GetDepartmentById(int departmentId)
         {
-            var college = _dbContext
-                .Colleges
-                .Include(c => c.Departments)
-                .FirstOrDefault(c => c.Id == collegeId);
-            return college;
-        }
-
-        private Department GetDepartmentById(int collegeId, int departmentId)
-        {
-
             var department = _dbContext.
                 Departments.
-                FirstOrDefault(d => (d.Id == departmentId && d.CollegeId == collegeId));
+                FirstOrDefault(d => d.Id == departmentId);
 
-            if (department == null || department.Id != departmentId || department.CollegeId != collegeId)
+            if (department == null || department.Id != departmentId)
             {
-                throw new NotFoundException("Department or college not found");
+                throw new NotFoundException("Department not found");
             }
 
             return department;

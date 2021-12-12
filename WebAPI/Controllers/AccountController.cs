@@ -88,7 +88,8 @@ namespace WebAPI.Controllers
                                 FirstName = dto.FirstName,
                                 LastName = dto.LastName,
                                 RegistrationDate = DateTime.Now,
-                                Title = dto.PromoterTitle
+                                Title = dto.PromoterTitle,
+                                DepartmentId = dto.DepartmentId
                             };
                             var result = await _userManager.CreateAsync(promoter, dto.Password);
                             
@@ -98,8 +99,12 @@ namespace WebAPI.Controllers
                                 _logger.LogInformation("New promoter created");
                                 return Created("Promoter created", null);
                             }
+                            else
+                            {
+                                _logger.LogInformation("Error creating new promoter");
+                                return BadRequest("Promoter not created");
+                            }
 
-                            return BadRequest();
                         }
                     case (int)RoleValue.Student:
                         {
@@ -110,7 +115,8 @@ namespace WebAPI.Controllers
                                 FirstName = dto.FirstName,
                                 LastName = dto.LastName,
                                 RegistrationDate = DateTime.Now,
-                                IndexNumber = dto.StudentIndexNumber
+                                IndexNumber = dto.StudentIndexNumber,
+                                DepartmentId = dto.DepartmentId
                             };
                             var result = await _userManager.CreateAsync(student, dto.Password);
                             if (result.Succeeded)
@@ -119,7 +125,11 @@ namespace WebAPI.Controllers
                                 _logger.LogInformation("New student created");
                                 return Created("Student created", null);
                             }
-                            return BadRequest();
+                            else
+                            {
+                                _logger.LogInformation("Error creating new student");
+                                return BadRequest("Student not created");
+                            }
                         }
                     case (int)RoleValue.Admin:
                         {
@@ -138,8 +148,11 @@ namespace WebAPI.Controllers
                                 _logger.LogInformation("New admin created");
                                 return Created("Admin created", null);
                             }
-
-                            return BadRequest();
+                            else
+                            {
+                                _logger.LogInformation("Error creating new admin");
+                                return BadRequest("Admin not created");
+                            }
                         }
 
                 }

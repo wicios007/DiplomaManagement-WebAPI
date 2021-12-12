@@ -33,6 +33,8 @@ namespace WebAPI.Models
         public string PromoterTitle { get; set; }
         [Display(Name = "Student index number")]
         public string StudentIndexNumber { get; set; }
+        [Display(Name = "Department")]
+        public int DepartmentId{get;set;}
 
     }
 }

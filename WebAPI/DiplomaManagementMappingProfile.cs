@@ -13,25 +13,6 @@ namespace WebAPI
     {
         public DiplomaManagementMappingProfile()
         {
-            CreateMap<College, CollegeDto>()
-                .ForMember(m => m.City, c => c.MapFrom(c => c.Address.City))
-                .ForMember(m => m.Street, c => c.MapFrom(c => c.Address.Street))
-                .ForMember(m => m.PostalCode, c => c.MapFrom(c => c.Address.PostalCode));
-
-            CreateMap<CreateCollegeDto, College>()
-                .ForMember(c => c.Address, m => m.MapFrom(dto => new Address()
-                {
-                    City = dto.City,
-                    Street = dto.Street,
-                    PostalCode = dto.PostalCode
-                }));
-            CreateMap<UpdateCollegeDto, College>()
-                .ForMember(c => c.Address, m => m.MapFrom(dto => new Address()
-                {
-                    City = dto.City,
-                    Street = dto.Street,
-                    PostalCode = dto.PostalCode
-                }));
             CreateMap<Department, DepartmentDto>();
             CreateMap<CreateDepartmentDto, Department>();
             CreateMap<UpdateDepartmentDto, DepartmentDto>();
@@ -47,6 +28,9 @@ namespace WebAPI
                 .ForMember(dest => dest.Email, y => y.MapFrom(src => src.Email))
                 .ForMember(dest => dest.FirstName, y => y.MapFrom(src => src.FirstName))
                 .ForMember(dest => dest.LastName, y => y.MapFrom(src => src.LastName));
+
+            CreateMap<ProposedThesisDto, ProposedThese>();
+            CreateMap<ProposedThese, ProposedThesisDto>();
         }
         
     }

@@ -10,8 +10,8 @@ using WebAPI.Entities;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(DiplomaManagementDbContext))]
-    [Migration("20211119212430_RefactorToIdentityUser")]
-    partial class RefactorToIdentityUser
+    [Migration("20211207185211_RefactoredToIdentityUserAndProposedThese")]
+    partial class RefactoredToIdentityUserAndProposedThese
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -195,6 +195,63 @@ namespace WebAPI.Migrations
                     b.ToTable("Departments");
                 });
 
+            modelBuilder.Entity("WebAPI.Entities.ProposedThese", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAccepted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("ProposedTheses");
+                });
+
+            modelBuilder.Entity("WebAPI.Entities.ProposedTheseComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PromoterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProposedTheseId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PromoterId");
+
+                    b.HasIndex("ProposedTheseId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("ProposedTheseComments");
+                });
+
             modelBuilder.Entity("WebAPI.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -253,11 +310,18 @@ namespace WebAPI.Migrations
                     b.Property<int?>("PromoterId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("StudentId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("PromoterId");
+
+                    b.HasIndex("StudentId")
+                        .IsUnique()
+                        .HasFilter("[StudentId] IS NOT NULL");
 
                     b.ToTable("Theses");
                 });
@@ -343,6 +407,13 @@ namespace WebAPI.Migrations
                     b.HasDiscriminator<int>("UserType").HasValue(0);
                 });
 
+            modelBuilder.Entity("WebAPI.Entities.Admin", b =>
+                {
+                    b.HasBaseType("WebAPI.Entities.User");
+
+                    b.HasDiscriminator().HasValue(3);
+                });
+
             modelBuilder.Entity("WebAPI.Entities.Promoter", b =>
                 {
                     b.HasBaseType("WebAPI.Entities.User");
@@ -369,12 +440,7 @@ namespace WebAPI.Migrations
                     b.Property<string>("IndexNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ThesisId")
-                        .HasColumnType("int");
-
                     b.HasIndex("DepartmentId");
-
-                    b.HasIndex("ThesisId");
 
                     b.HasDiscriminator().HasValue(2);
                 });
@@ -452,15 +518,57 @@ namespace WebAPI.Migrations
                     b.Navigation("College");
                 });
 
+            modelBuilder.Entity("WebAPI.Entities.ProposedThese", b =>
+                {
+                    b.HasOne("WebAPI.Entities.Student", "Student")
+                        .WithMany("ProposedThesesList")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("WebAPI.Entities.ProposedTheseComment", b =>
+                {
+                    b.HasOne("WebAPI.Entities.Promoter", "Promoter")
+                        .WithMany()
+                        .HasForeignKey("PromoterId");
+
+                    b.HasOne("WebAPI.Entities.ProposedThese", "ProposedThese")
+                        .WithMany("Comments")
+                        .HasForeignKey("ProposedTheseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebAPI.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId");
+
+                    b.Navigation("Promoter");
+
+                    b.Navigation("ProposedThese");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("WebAPI.Entities.Thesis", b =>
                 {
                     b.HasOne("WebAPI.Entities.Department", null)
                         .WithMany("Theses")
                         .HasForeignKey("DepartmentId");
 
-                    b.HasOne("WebAPI.Entities.Promoter", null)
+                    b.HasOne("WebAPI.Entities.Promoter", "Promoter")
                         .WithMany("Theses")
                         .HasForeignKey("PromoterId");
+
+                    b.HasOne("WebAPI.Entities.Student", "Student")
+                        .WithOne("Thesis")
+                        .HasForeignKey("WebAPI.Entities.Thesis", "StudentId");
+
+                    b.Navigation("Promoter");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("WebAPI.Entities.Promoter", b =>
@@ -475,12 +583,6 @@ namespace WebAPI.Migrations
                     b.HasOne("WebAPI.Entities.Department", null)
                         .WithMany("Students")
                         .HasForeignKey("DepartmentId");
-
-                    b.HasOne("WebAPI.Entities.Thesis", "Thesis")
-                        .WithMany()
-                        .HasForeignKey("ThesisId");
-
-                    b.Navigation("Thesis");
                 });
 
             modelBuilder.Entity("WebAPI.Entities.Address", b =>
@@ -502,9 +604,21 @@ namespace WebAPI.Migrations
                     b.Navigation("Theses");
                 });
 
+            modelBuilder.Entity("WebAPI.Entities.ProposedThese", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
             modelBuilder.Entity("WebAPI.Entities.Promoter", b =>
                 {
                     b.Navigation("Theses");
+                });
+
+            modelBuilder.Entity("WebAPI.Entities.Student", b =>
+                {
+                    b.Navigation("ProposedThesesList");
+
+                    b.Navigation("Thesis");
                 });
 #pragma warning restore 612, 618
         }

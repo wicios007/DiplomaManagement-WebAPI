@@ -12,15 +12,11 @@ namespace WebAPI.Entities
         public string LastName{ get; set; }
         public DateTime RegistrationDate { get; set; }
 
-        /*        public string? Title { get; set; }
-                public string? IndexNumber { get; set; }*/
         /*public int? ThesisId { get; set; }
         public Thesis? Thesis { get; set; }*/
 
-        //public int CollegeId { get; set; }
-        //public virtual College College { get; set; }
-        //public int DepartmentId { get; set; }
-        //public virtual Department Department { get; set; }
+        public int? DepartmentId { get; set; }
+        public virtual Department Department { get; set; }
 
     }
 }

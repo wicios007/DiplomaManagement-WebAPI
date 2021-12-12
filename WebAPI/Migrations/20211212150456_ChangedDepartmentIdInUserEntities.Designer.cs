@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Entities;
 
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(DiplomaManagementDbContext))]
-    partial class DiplomaManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211212150456_ChangedDepartmentIdInUserEntities")]
+    partial class ChangedDepartmentIdInUserEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -449,15 +451,13 @@ namespace WebAPI.Migrations
 
             modelBuilder.Entity("WebAPI.Entities.ProposedThese", b =>
                 {
-                    b.HasOne("WebAPI.Entities.Department", "Department")
+                    b.HasOne("WebAPI.Entities.Department", null)
                         .WithMany("ProposedTheses")
                         .HasForeignKey("DepartmentId");
 
                     b.HasOne("WebAPI.Entities.Student", "Student")
                         .WithMany("ProposedThesesList")
                         .HasForeignKey("StudentId");
-
-                    b.Navigation("Department");
 
                     b.Navigation("Student");
                 });
@@ -487,7 +487,7 @@ namespace WebAPI.Migrations
 
             modelBuilder.Entity("WebAPI.Entities.Thesis", b =>
                 {
-                    b.HasOne("WebAPI.Entities.Department", "Department")
+                    b.HasOne("WebAPI.Entities.Department", null)
                         .WithMany("Theses")
                         .HasForeignKey("DepartmentId");
 
@@ -498,8 +498,6 @@ namespace WebAPI.Migrations
                     b.HasOne("WebAPI.Entities.Student", "Student")
                         .WithOne("Thesis")
                         .HasForeignKey("WebAPI.Entities.Thesis", "StudentId");
-
-                    b.Navigation("Department");
 
                     b.Navigation("Promoter");
 

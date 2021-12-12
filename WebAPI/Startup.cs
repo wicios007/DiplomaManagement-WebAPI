@@ -61,12 +61,14 @@ namespace WebAPI
             services.AddScoped<DiplomaManagementSeeder>();
             services.AddAutoMapper(this.GetType().Assembly);
 
-            services.AddScoped<ICollegeService, CollegeService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IThesisService, ThesisService>();
+
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
             services.AddScoped<IUserContextService, UserContextService>();
+
+            services.AddScoped<IProposedThesisService, ProposedThesisService>();
             //services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ErrorHandlingMiddleware>();
             services.AddScoped<RequestTimeMiddleware>();

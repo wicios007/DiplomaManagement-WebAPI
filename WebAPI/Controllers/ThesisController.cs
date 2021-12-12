@@ -10,7 +10,7 @@ using WebAPI.Models;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/college/{collegeId}/department/{departmentId}/thesis")]
+    [Route("api/department/{departmentId}/thesis")]
     [ApiController]
     //[Authorize]
     public class ThesisController : ControllerBase
@@ -23,52 +23,52 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<ThesisDto>> GetAll([FromRoute]int collegeId, [FromRoute]int departmentId)
+        public ActionResult<List<ThesisDto>> GetAll([FromRoute]int departmentId)
         {
-            var result = _thesisService.GetAll(collegeId, departmentId);
+            var result = _thesisService.GetAll(departmentId);
 
             return Ok(result);
         }
 
         [HttpGet]
         [Route("{thesisId}")]
-        public ActionResult<ThesisDto> Get([FromRoute] int collegeId, [FromRoute] int departmentId,
+        public ActionResult<ThesisDto> Get([FromRoute] int departmentId,
             [FromRoute] int thesisId)
         {
-            var thesis = _thesisService.GetById(collegeId, departmentId, thesisId);
+            var thesis = _thesisService.GetById(departmentId, thesisId);
 
             return Ok(thesis);
         }
 
         [HttpPut]
         [Route("{thesisId}")]
-        public ActionResult Update([FromRoute] int collegeId, [FromRoute] int departmentId, [FromRoute] int thesisId, [FromBody] ThesisDto dto)
+        public ActionResult Update([FromRoute] int departmentId, [FromRoute] int thesisId, [FromBody] ThesisDto dto)
         {
-            _thesisService.Update(collegeId, departmentId, thesisId, dto);
+            _thesisService.Update(departmentId, thesisId, dto);
             return Ok();
         }
 
         [HttpPost]
-        public ActionResult<ThesisDto> Create([FromRoute] int collegeId, [FromRoute] int departmentId,
+        public ActionResult<ThesisDto> Create([FromRoute] int departmentId,
             [FromBody] ThesisDto dto)
         {
-            var id = _thesisService.Create(collegeId, departmentId, dto);
-            return Created($"api/college/{collegeId}/department/{departmentId}/thesis/{id}", null);
+            var id = _thesisService.Create(departmentId, dto);
+            return Created($"api/department/{departmentId}/thesis/{id}", null);
         }
 
         [HttpDelete]
-        public ActionResult DeleteAll([FromRoute] int collegeId, [FromRoute] int departmentId)
+        public ActionResult DeleteAll([FromRoute] int departmentId)
         {
-            _thesisService.DeleteAll(collegeId, departmentId);
+            _thesisService.DeleteAll(departmentId);
             return NoContent();
         }
 
         [HttpDelete]
         [Route("{thesisId}")]
-        public ActionResult DeleteById([FromRoute] int collegeId, [FromRoute] int departmentId,
+        public ActionResult DeleteById([FromRoute] int departmentId,
             [FromRoute] int thesisId)
         {
-            _thesisService.Delete(collegeId,departmentId,thesisId);
+            _thesisService.Delete(departmentId,thesisId);
             return NoContent();
         }
 
