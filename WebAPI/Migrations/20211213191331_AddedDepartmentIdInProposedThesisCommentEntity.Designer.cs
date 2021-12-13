@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Entities;
 
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(DiplomaManagementDbContext))]
-    partial class DiplomaManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211213191331_AddedDepartmentIdInProposedThesisCommentEntity")]
+    partial class AddedDepartmentIdInProposedThesisCommentEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,17 +165,12 @@ namespace WebAPI.Migrations
                     b.Property<string>("NameEnglish")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PromoterId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("StudentId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
-
-                    b.HasIndex("PromoterId");
 
                     b.HasIndex("StudentId");
 
@@ -463,17 +460,11 @@ namespace WebAPI.Migrations
                         .WithMany("ProposedTheses")
                         .HasForeignKey("DepartmentId");
 
-                    b.HasOne("WebAPI.Entities.Promoter", "Promoter")
-                        .WithMany()
-                        .HasForeignKey("PromoterId");
-
                     b.HasOne("WebAPI.Entities.Student", "Student")
                         .WithMany("ProposedThesesList")
                         .HasForeignKey("StudentId");
 
                     b.Navigation("Department");
-
-                    b.Navigation("Promoter");
 
                     b.Navigation("Student");
                 });

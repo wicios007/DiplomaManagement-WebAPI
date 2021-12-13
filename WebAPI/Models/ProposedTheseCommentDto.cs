@@ -8,6 +8,8 @@ namespace WebAPI.Models
 {
     public class ProposedTheseCommentDto
     {
+        public int PromoterId{get;set;}
+        public int StudentId{get;set;}
         public string Comment{get;set;}
     }
 }

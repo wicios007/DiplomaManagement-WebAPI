@@ -24,6 +24,7 @@ using WebAPI.Middleware;
 using WebAPI.Models;
 using WebAPI.Models.Validators;
 using WebAPI.Services;
+using System.Security.Claims;
 
 namespace WebAPI
 {
@@ -54,6 +55,12 @@ namespace WebAPI
             .AddUserManager<UserManager<User>>()
             .AddEntityFrameworkStores<DiplomaManagementDbContext>()
             .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
+                options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
+            });
 
 
             services.AddControllers().AddFluentValidation();

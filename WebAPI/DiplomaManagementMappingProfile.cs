@@ -15,7 +15,8 @@ namespace WebAPI
         {
             CreateMap<Department, DepartmentDto>();
             CreateMap<CreateDepartmentDto, Department>();
-            CreateMap<UpdateDepartmentDto, DepartmentDto>();
+            CreateMap<UpdateDepartmentDto, Department>();
+            
 
             CreateMap<Thesis, ThesisDto>();
             CreateMap<ThesisDto, Thesis>();

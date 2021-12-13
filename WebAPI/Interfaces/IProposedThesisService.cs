@@ -11,10 +11,10 @@ namespace WebAPI.Interfaces
     {
         int Create(ProposedThesisDto dto);
         void Delete(int id);
-        void Update(int id, ProposedThesisDto dto);
-        ProposedThesisDto GetById(int id);
+        void Update(int id, ProposedThesisUpdateDto dto);
+        ProposedThesisDto GetById(int departmentId, int id);
         List<ProposedThesisDto> GetAll();
         List<ProposedThesisDto> GetAllFromDepartment(int departmentId);
-
+        List<ProposedThesisDto> GetByStudentId(int departmentId, int studentId);
     }
 }

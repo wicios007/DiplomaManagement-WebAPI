@@ -187,9 +187,11 @@ namespace WebAPI.Controllers
                 var user = await _userManager.FindByEmailAsync(dto.Email);
                 var userRoles = await _userManager.GetRolesAsync(user);
 
+                var userId = user.Id;
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, dto.Email),
+                    new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
                     new Claim(JwtRegisteredClaimNames.Nbf,
                         new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString()),
                     new Claim(JwtRegisteredClaimNames.Exp,
@@ -197,6 +199,7 @@ namespace WebAPI.Controllers
                                   new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds)).ToString()),
                 };
                 claims.AddRange(userRoles.Select(ur => new Claim(ClaimTypes.Role, ur)));
+
                 var role = userRoles.Select(ur => new Claim(ClaimTypes.Role, ur)).Select(u => u.Value);
 
                 var token = new JwtSecurityToken(

@@ -10,12 +10,11 @@ namespace WebAPI.Interfaces
     public interface IProposedThesisCommentService
     {
         List<ProposedTheseCommentDto> GetAll();
-
-        ProposedTheseCommentDto GetById(int id);
-
-        int Create(ProposedTheseCommentDto dto);
-
-        void Update(int id, UpdateProposedTheseCommentDto dto);
+        List<ProposedTheseCommentDto> GetAllThesisComments(int departmentId, int proposedThesisId);
+        ProposedTheseCommentDto GetById(int departmentId, int proposedThesisId, int commentId);
+        int Create(int departmentId, int proposedThesisId, ProposedTheseCommentDto dto);
+        void Update(int departmentId, int proposedThesisId, int commentId, UpdateProposedTheseCommentDto dto);
         void Delete(int id);
+
     }
 }

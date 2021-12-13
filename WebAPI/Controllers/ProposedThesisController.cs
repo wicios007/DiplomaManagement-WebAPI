@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace WebAPI.Controllers
 {
     [Route("api/department/{departmentId}/proposedThesis")]
     [ApiController]
+    [Authorize]
     public class ProposedThesisController : ControllerBase
     {
         public readonly IProposedThesisService proposedThesisService;
@@ -28,12 +30,12 @@ namespace WebAPI.Controllers
         [Route("{id}")]
         public ActionResult<ProposedThesisDto> GetById([FromRoute] int departmentId, [FromRoute]int id)
         {
-            var result = proposedThesisService.GetById(id);
-            return result;
+            var result = proposedThesisService.GetById(departmentId, id);
+            return Ok(result);
         }
         [HttpPut]
         [Route("{id}")]
-        public ActionResult Update([FromRoute] int departmentId, [FromRoute] int id, ProposedThesisDto dto)
+        public ActionResult Update([FromRoute] int departmentId, [FromRoute] int id, ProposedThesisUpdateDto dto)
         {
             proposedThesisService.Update(id, dto);
             return Ok();
@@ -50,6 +52,13 @@ namespace WebAPI.Controllers
         {
             proposedThesisService.Delete(id);
             return NoContent();
+        }
+        [HttpGet]
+        [Route("student/{studentId}")]
+        public ActionResult<List<ProposedThesisDto>> GetByStudentId([FromRoute] int departmentId, [FromQuery] int studentId)
+        {
+            var result = proposedThesisService.GetByStudentId(departmentId, studentId);
+            return Ok(result);
         }
         
     }
