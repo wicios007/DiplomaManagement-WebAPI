@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Entities;
 
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(DiplomaManagementDbContext))]
-    partial class DiplomaManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211214140640_NullableValuesInProposedThesis")]
+    partial class NullableValuesInProposedThesis
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,6 +168,9 @@ namespace WebAPI.Migrations
                     b.Property<string>("NameEnglish")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("PromoterId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("StudentId")
                         .HasColumnType("int");
 
@@ -174,6 +179,8 @@ namespace WebAPI.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DepartmentId");
+
+                    b.HasIndex("PromoterId");
 
                     b.HasIndex("StudentId");
 
@@ -190,22 +197,27 @@ namespace WebAPI.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CreatedById")
+                    b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DepartmentId")
+                    b.Property<int?>("PromoterId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProposedTheseId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<int?>("StudentId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("CreatedById");
+                    b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
 
+                    b.HasIndex("PromoterId");
+
                     b.HasIndex("ProposedTheseId");
+
+                    b.HasIndex("StudentId");
 
                     b.ToTable("ProposedTheseComments");
                 });
@@ -462,6 +474,10 @@ namespace WebAPI.Migrations
                         .WithMany("ProposedTheses")
                         .HasForeignKey("DepartmentId");
 
+                    b.HasOne("WebAPI.Entities.Promoter", "Promoter")
+                        .WithMany()
+                        .HasForeignKey("PromoterId");
+
                     b.HasOne("WebAPI.Entities.Student", "Student")
                         .WithMany("ProposedThesesList")
                         .HasForeignKey("StudentId");
@@ -470,20 +486,20 @@ namespace WebAPI.Migrations
 
                     b.Navigation("Department");
 
+                    b.Navigation("Promoter");
+
                     b.Navigation("Student");
                 });
 
             modelBuilder.Entity("WebAPI.Entities.ProposedTheseComment", b =>
                 {
-                    b.HasOne("WebAPI.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WebAPI.Entities.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId");
+
+                    b.HasOne("WebAPI.Entities.Promoter", "Promoter")
+                        .WithMany()
+                        .HasForeignKey("PromoterId");
 
                     b.HasOne("WebAPI.Entities.ProposedThese", "ProposedThese")
                         .WithMany("Comments")
@@ -491,11 +507,17 @@ namespace WebAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CreatedBy");
+                    b.HasOne("WebAPI.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId");
 
                     b.Navigation("Department");
 
+                    b.Navigation("Promoter");
+
                     b.Navigation("ProposedThese");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("WebAPI.Entities.Thesis", b =>

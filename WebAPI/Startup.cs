@@ -76,6 +76,7 @@ namespace WebAPI
             services.AddScoped<IUserContextService, UserContextService>();
 
             services.AddScoped<IProposedThesisService, ProposedThesisService>();
+            services.AddScoped<IProposedThesisCommentService, ProposedThesisCommentService>();
             //services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ErrorHandlingMiddleware>();
             services.AddScoped<RequestTimeMiddleware>();

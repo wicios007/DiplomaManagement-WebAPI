@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -20,19 +21,17 @@ namespace WebAPI.Services
         private readonly DiplomaManagementDbContext dbContext;
         private readonly ILogger<ProposedThesisCommentService> logger;
         private readonly IProposedThesisService proposedThesisService;
-        private readonly IHttpContextAccessor contextAccessor;
-        private string UserId { get; set; }
-        private string Role { get; set; }
+        private readonly UserManager<User> userManager;
+        private readonly IUserContextService userContextService;
 
-        public ProposedThesisCommentService(DiplomaManagementDbContext _dbContext, IMapper _mapper, ILogger<ProposedThesisCommentService> _logger, IProposedThesisService _proposedThesisService, IHttpContextAccessor _contextAccessor)
+        public ProposedThesisCommentService(DiplomaManagementDbContext _dbContext, IMapper _mapper, ILogger<ProposedThesisCommentService> _logger, IProposedThesisService _proposedThesisService, UserManager<User> _userManager, IUserContextService _userContextService)
         {
             dbContext = _dbContext;
             mapper = _mapper;
             logger = _logger;
             proposedThesisService = _proposedThesisService;
-            contextAccessor = _contextAccessor;
-            UserId = contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Role = contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
+            userManager = _userManager;
+            userContextService = _userContextService;
         }
         public List<ProposedTheseCommentDto> GetAll()
         {
@@ -58,20 +57,22 @@ namespace WebAPI.Services
 
         public int Create(int departmentId, int proposedThesisId, ProposedTheseCommentDto dto)
         {
-            var thesis = proposedThesisService.GetById(departmentId, proposedThesisId);
+            var department = dbContext.Departments.FirstOrDefault(c => c.Id == departmentId);
+            var thesis = dbContext.ProposedTheses.FirstOrDefault(c => c.Id == proposedThesisId);
+
             var comment = mapper.Map<ProposedTheseComment>(dto);
-            switch (Role)
-            {
-                case "Student":
-                    comment.StudentId = Convert.ToInt32(UserId);
-                    break;
-                case "Promoter":
-                    comment.PromoterId = Convert.ToInt32(UserId);
-                    break;
-                default:
-                    break;
-            }
+            var user = userManager.Users.FirstOrDefault(c => c.Id == userContextService.GetUserId);
+            comment.CreatedBy = user;
+            comment.CreatedById = user.Id;
+
+            comment.ProposedThese = thesis;
+            comment.ProposedTheseId = thesis.Id;
+
+            comment.Department = department;
+            comment.DepartmentId = department.Id;
+
             dbContext.ProposedTheseComments.Add(comment);
+            
             dbContext.SaveChanges();
             return comment.Id;
         }
@@ -84,25 +85,8 @@ namespace WebAPI.Services
             {
                 throw new NotFoundException("Comment not found");
             }
-            try
-            {
-                comment.Comment = dto.Comment;
-                switch (Role)
-                {
-                    case "Student":
-                        comment.StudentId = Convert.ToInt32(UserId);
-                        break;
-                    case "Promoter":
-                        comment.PromoterId = Convert.ToInt32(UserId);
-                        break;
-                    default:
-                        break;
-                }
-            }catch(Exception e)
-            {
-                logger.LogError(e.Message);
-                throw;
-            }
+            comment.Comment = dto.Comment;
+
             dbContext.SaveChanges();
 
         }

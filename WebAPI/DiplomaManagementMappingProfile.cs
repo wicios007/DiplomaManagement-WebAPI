@@ -32,6 +32,9 @@ namespace WebAPI
 
             CreateMap<ProposedThesisDto, ProposedThese>();
             CreateMap<ProposedThese, ProposedThesisDto>();
+
+            CreateMap<ProposedTheseComment, ProposedTheseCommentDto>();
+            CreateMap<ProposedTheseCommentDto, ProposedTheseComment>();
         }
         
     }

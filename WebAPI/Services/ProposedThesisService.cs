@@ -22,27 +22,27 @@ namespace WebAPI.Services
         private readonly ILogger<ProposedThesisService> logger;
         private readonly IDepartmentService departmentService;
         private readonly UserManager<User> userManager;
-        private readonly IHttpContextAccessor contextAccessor;
-        private string UserId { get; set; }
-        private string Role { get; set; }
+        private readonly IUserContextService userContextService;
 
-        public ProposedThesisService(DiplomaManagementDbContext _dbContext, IMapper _mapper, ILogger<ProposedThesisService> _logger, IDepartmentService _departmentService, UserManager<User> _userManager, IHttpContextAccessor _contextAccessor)
+        public ProposedThesisService(DiplomaManagementDbContext _dbContext, IMapper _mapper, ILogger<ProposedThesisService> _logger, IDepartmentService _departmentService, UserManager<User> _userManager, IUserContextService _userContextService)
         {
             dbContext = _dbContext;
             mapper = _mapper;
             logger = _logger;
             departmentService = _departmentService;
             userManager = _userManager;
-            contextAccessor = _contextAccessor;
-            UserId = contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Role = contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
+            userContextService = _userContextService;
         }
 
         public int Create(ProposedThesisDto dto)
         {
-
             ProposedThese propThese = mapper.Map<ProposedThese>(dto);
-            switch (Role)
+            propThese.CreatedById = userContextService.GetUserId;
+            var user = userManager.Users.FirstOrDefault(c => c.Id == userContextService.GetUserId);
+            propThese.Student = (Student)user;
+            propThese.StudentId = user.Id;
+            
+            /*switch (Role)
             {
                 case "Student":
                     propThese.StudentId = Convert.ToInt32(UserId); //TODO: wykrzacza się, błąd z foreign key
@@ -52,7 +52,7 @@ namespace WebAPI.Services
                     break;
                 default:
                     break;
-            }
+            }*/
             dbContext.ProposedTheses.Add(propThese);
             dbContext.SaveChanges();
             return propThese.Id;
@@ -82,21 +82,23 @@ namespace WebAPI.Services
             propThese.Name = dto.Name;
             propThese.NameEnglish = dto.NameEnglish;
             propThese.Description = dto.Description;
-            switch (Role)
-            {
-                case "Student":
-                    propThese.StudentId = Convert.ToInt32(UserId);
-                    break;
-                case "Promoter":
-                    propThese.PromoterId = Convert.ToInt32(UserId);
-                    break;
-                default:
-                    break;
-            }
-
+            propThese.CreatedById = userContextService.GetUserId;
+            propThese.IsAccepted = dto.IsAccepted;
             dbContext.SaveChanges();
         }
-
+/*        public void Accept(int id, ProposedThesisAcceptDto dto)
+        {
+            ProposedThese propThese = dbContext
+                .ProposedTheses
+                .FirstOrDefault(c => c.Id == id);
+            if(propThese is null)
+            {
+                throw new NotFoundException("Proposed these not found");
+            }
+            propThese.IsAccepted = dto.accept;
+            dbContext.SaveChanges();
+        }
+*/
         public ProposedThesisDto GetById(int departmentId, int id)
         {
             var propThese = dbContext.ProposedTheses.FirstOrDefault(t => t.Id == id);
