@@ -33,8 +33,9 @@ namespace WebAPI.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
+        private readonly IEmailSenderService _emailSenderService;
 
-        public AccountController(ILogger<AccountController> logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager)
+        public AccountController(ILogger<AccountController> logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager, IEmailSenderService emailSenderService)
         {
             _logger = logger;
             _mapper = mapper;
@@ -42,6 +43,7 @@ namespace WebAPI.Controllers
             _signInManager = signInManager;
             _userManager = userManager;
             _roleManager = roleManager;
+            _emailSenderService = emailSenderService;
         }
         [Authorize(Roles = "Admin")]
         [HttpPost("register")]
@@ -221,6 +223,19 @@ namespace WebAPI.Controllers
                 return BadRequest("Error occurred");
             }
         }
+        //[AllowAnonymous]
+        [HttpPost("send")]
+        public async Task<ActionResult> SendEmail([FromBody] SendEmailDto dto)
+        {
+            if(ModelState == null || !ModelState.IsValid)
+            {
+                return BadRequest("Model error");
+            }
+            await _emailSenderService.SendEmailAsync(dto.DestId, dto.Subject, dto.Content);
+            
+            return Ok();
+        }
+
         [HttpGet("users")]
         public List<UserDto> GetUsers(){
             var users = _userManager
@@ -230,12 +245,19 @@ namespace WebAPI.Controllers
             var result = _mapper.Map<List<UserDto>>(users);            
             return result;
         }
+        [HttpGet("users/{id}")]
+        public ActionResult<UserDto> GetUserById(int id)
+        {
+            var user = _userManager.Users.FirstOrDefault(c => c.Id == id);
+            var result = _mapper.Map<UserDto>(user);
+            return Ok(result);
+        }
 
         [HttpGet("roles")]
-        public List<Role> GetRoles()
+        public ActionResult<List<Role>> GetRoles()
         {
             var roles = _roleManager.Roles.ToList();
-            return roles;
+            return Ok(roles);
         }
     }
 }

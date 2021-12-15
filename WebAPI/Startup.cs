@@ -25,6 +25,8 @@ using WebAPI.Models;
 using WebAPI.Models.Validators;
 using WebAPI.Services;
 using System.Security.Claims;
+using System.Net.Mail;
+using System.Net;
 
 namespace WebAPI
 {
@@ -80,6 +82,20 @@ namespace WebAPI
             //services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ErrorHandlingMiddleware>();
             services.AddScoped<RequestTimeMiddleware>();
+            services.AddScoped<IEmailSenderService, EmailSenderService>();
+            services.AddScoped((serviceProvider) =>
+            {
+                var config = serviceProvider.GetRequiredService<IConfiguration>();
+                return new SmtpClient()
+                {
+                    Host = config.GetValue<string>("Email:Smtp:Host"),
+                    Port = config.GetValue<int>("Email:Smtp:Port"),
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(config.GetValue<string>("Email:Smtp:Username"), config.GetValue<string>("Email:Smtp:Password"))
+                };
+            });
 
             services.AddAuthentication(options =>
             {
