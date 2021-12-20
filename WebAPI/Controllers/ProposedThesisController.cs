@@ -55,10 +55,19 @@ namespace WebAPI.Controllers
         }
         [HttpGet]
         [Route("student/{studentId}")]
-        public ActionResult<List<ProposedThesisDto>> GetByStudentId([FromRoute] int departmentId, [FromQuery] int studentId)
+        public ActionResult<List<ProposedThesisDto>> GetByStudentId([FromRoute] int departmentId, [FromRoute] int studentId)
         {
             var result = proposedThesisService.GetByStudentId(departmentId, studentId);
             return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("{proposedThesisId}/accept")]
+        [Authorize(Roles = "Promoter")]
+        public ActionResult AcceptThesis([FromRoute] int departmentId, [FromRoute] int proposedThesisId)
+        {
+            var acceptedId = proposedThesisService.Accept(departmentId, proposedThesisId);
+            return Created($"api/department/{departmentId}/thesis/{acceptedId}", null);
         }
         
     }

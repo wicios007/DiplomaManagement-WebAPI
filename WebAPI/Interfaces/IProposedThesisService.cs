@@ -13,6 +13,7 @@ namespace WebAPI.Interfaces
         void Delete(int id);
         void Update(int id, ProposedThesisUpdateDto dto);
         ProposedThesisDto GetById(int departmentId, int id);
+        int Accept(int departmentId, int proposedThesisId);
         List<ProposedThesisDto> GetAll();
         List<ProposedThesisDto> GetAllFromDepartment(int departmentId);
         List<ProposedThesisDto> GetByStudentId(int departmentId, int studentId);

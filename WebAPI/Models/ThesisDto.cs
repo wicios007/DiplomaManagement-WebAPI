@@ -14,6 +14,8 @@ namespace WebAPI.Models
         public string Name { get; set; }
         public string NameEnglish { get; set; }
         public string Description { get; set; }
-        public bool IsTaken { get; set; }
+        public int StudentId{get;set;}
+        public int PromoterId{get;set;}
+        //public bool IsTaken { get; set; }
     }
 }

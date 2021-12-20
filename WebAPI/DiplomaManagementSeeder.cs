@@ -154,7 +154,7 @@ namespace WebAPI
                     NameEnglish = "Application for theses management",
                     Description =
                         "Stworzenie aplikacji do zarządzania pracami dyplomowymi z użyciem frameworków .NET 5.0 oraz Angular",
-                    IsTaken = true
+                    //IsTaken = true
                 },
                 new Thesis()
                 {
@@ -162,7 +162,7 @@ namespace WebAPI
                     NameEnglish = "Sample",
                     Description =
                         "SAMPLE Stworzenie projektu sieci",
-                    IsTaken = false
+                    //IsTaken = false
                 },
 
             };

@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
 using WebAPI.Entities;
+using WebAPI.Exceptions;
 using WebAPI.Interfaces;
 using WebAPI.Middleware;
 using WebAPI.Models;
@@ -34,8 +35,9 @@ namespace WebAPI.Controllers
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IEmailSenderService _emailSenderService;
+        private readonly IUserContextService _userContextService;
 
-        public AccountController(ILogger<AccountController> logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager, IEmailSenderService emailSenderService)
+        public AccountController(ILogger<AccountController> logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager, IEmailSenderService emailSenderService, IUserContextService userContextService)
         {
             _logger = logger;
             _mapper = mapper;
@@ -44,6 +46,7 @@ namespace WebAPI.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
             _emailSenderService = emailSenderService;
+            _userContextService = userContextService;
         }
         [Authorize(Roles = "Admin")]
         [HttpPost("register")]
@@ -245,6 +248,18 @@ namespace WebAPI.Controllers
             var result = _mapper.Map<List<UserDto>>(users);            
             return result;
         }
+        [HttpGet("users/current")]
+        public UserDto GetCurrentUser()
+        {
+            var user = _userManager.Users.FirstOrDefault(c => c.Id == _userContextService.GetUserId);
+            if(user is null)
+            {
+                throw new NotFoundException("User not found");
+            }
+            var result = _mapper.Map<UserDto>(user);
+            return result;
+        }
+
         [HttpGet("users/{id}")]
         public ActionResult<UserDto> GetUserById(int id)
         {

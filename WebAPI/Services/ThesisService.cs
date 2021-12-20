@@ -30,8 +30,9 @@ namespace WebAPI.Services
             {
                 throw new NotFoundException("Department not found");
             }
+            var theses = _dbContext.Theses.Where(x => x.DepartmentId == departmentId).ToList();
 
-            var listOfTheses = _mapper.Map<List<ThesisDto>>(departments.Theses);
+            var listOfTheses = _mapper.Map<List<ThesisDto>>(theses);
 
             return listOfTheses;
         }
@@ -57,12 +58,12 @@ namespace WebAPI.Services
             {
                 throw new NotFoundException("department not found");
             }
-            var departmentEntity = _mapper.Map<Thesis>(dto);
+            var thesis = _mapper.Map<Thesis>(dto);
 
-            _dbContext.Theses.Add(departmentEntity);
+            _dbContext.Theses.Add(thesis);
             _dbContext.SaveChanges();
 
-            return departmentEntity.Id;
+            return thesis.Id;
 
         }
 
@@ -82,7 +83,7 @@ namespace WebAPI.Services
             thesis.Name = dto.Name;
             thesis.NameEnglish = dto.NameEnglish;
             thesis.Description = dto.Description;
-            thesis.IsTaken = dto.IsTaken;
+            //thesis.IsTaken = dto.IsTaken;
 
             /*
              tutaj powinienem dodać jeszcze zmianę id studenta oraz promotora, tylko musialbym to dodać w dtosach ?
@@ -117,9 +118,15 @@ namespace WebAPI.Services
             {
                 throw new NotFoundException("College or department not found");
             }
+            var theses = _dbContext.Theses.Where(x => x.DepartmentId == departmentId).ToList();
 
-            _dbContext.RemoveRange(department.Theses);
+            _dbContext.RemoveRange(theses);
             _dbContext.SaveChanges();
+        }
+
+        public void GenerateCard(ThesisCardDto dto)
+        {
+            
         }
 
 
