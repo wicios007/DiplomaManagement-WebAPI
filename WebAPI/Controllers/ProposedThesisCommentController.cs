@@ -23,9 +23,9 @@ namespace WebAPI.Controllers
             commentService = _commentService;
         }
         [HttpGet]
-        public ActionResult<List<ProposedTheseCommentDto>> GetAll([FromRoute] int departmentId)
+        public ActionResult<List<ProposedTheseCommentDto>> GetAll([FromRoute] int departmentId, [FromRoute] int proposedThesisId)
         {
-            var result = commentService.GetAll();
+            var result = commentService.GetAllThesisComments(departmentId, proposedThesisId);
             return Ok(result);
         }
         [HttpGet]
@@ -39,7 +39,7 @@ namespace WebAPI.Controllers
         public ActionResult Create([FromRoute] int departmentId, [FromRoute] int proposedThesisId, [FromBody] ProposedTheseCommentDto dto)
         {
             var id = commentService.Create(departmentId, proposedThesisId, dto);
-            return Created($"api/proposedThesis/{proposedThesisId}/comment/{id}", null);
+            return Created($"api/department/{departmentId}/proposedThesis/{proposedThesisId}/comment/{id}", null);
         }
         [HttpPut]
         [Route("{id}")]
