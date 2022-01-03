@@ -13,6 +13,8 @@ namespace WebAPI.Models
         public string LastName {get; set;}
         public string Email {get; set;}
         public int DepartmentId{get;set;}
+        public string IndexNumber{get;set;}
+        public string Title{get;set;}
 
     }
 }

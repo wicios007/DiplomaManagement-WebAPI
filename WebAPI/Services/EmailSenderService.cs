@@ -38,6 +38,7 @@ namespace WebAPI.Services
                 var sender = userManager.Users.FirstOrDefault(c => c.Id == userContextService.GetUserId);
                 string fullName = $"{sender.FirstName} {sender.LastName}";
                 var from = configuration.GetValue<string>("Email:Smtp:Username");
+                content += $"\nTen email został wysłany przez {fullName}. Kontynuuj konwersację wysyłając mail na {sender.Email}";
                 await SendEmailAsync(from, fullName, recv.Email, subject, content);
 
             }catch(Exception e)

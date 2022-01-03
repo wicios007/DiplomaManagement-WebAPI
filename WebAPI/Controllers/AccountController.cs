@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -36,8 +37,9 @@ namespace WebAPI.Controllers
         private readonly RoleManager<Role> _roleManager;
         private readonly IEmailSenderService _emailSenderService;
         private readonly IUserContextService _userContextService;
+        private readonly DiplomaManagementDbContext _dbContext;
 
-        public AccountController(ILogger<AccountController> logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager, IEmailSenderService emailSenderService, IUserContextService userContextService)
+        public AccountController(ILogger<AccountController> logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager, IEmailSenderService emailSenderService, IUserContextService userContextService, DiplomaManagementDbContext dbContext)
         {
             _logger = logger;
             _mapper = mapper;
@@ -47,6 +49,7 @@ namespace WebAPI.Controllers
             _roleManager = roleManager;
             _emailSenderService = emailSenderService;
             _userContextService = userContextService;
+            _dbContext = dbContext;
         }
         [Authorize(Roles = "Admin")]
         [HttpPost("register")]
@@ -240,24 +243,45 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("users")]
-        public List<UserDto> GetUsers(){
-            var users = _userManager
+        async public Task<List<UserDto>> GetUsers(){
+            var users = await _userManager
                 .Users
-                .ToList();
-            
-            var result = _mapper.Map<List<UserDto>>(users);            
+                .Include(c => c.Student)
+                .Include(c => c.Promoter) //TODO: 
+                .ToListAsync();
+                        
+            var result = _mapper.Map<List<UserDto>>(users);
             return result;
         }
-        [HttpGet("users/current")]
-        public UserDto GetCurrentUser()
+
+        [HttpGet("usersByRole")]
+        async public Task<ActionResult<List<UserDto>>> GetUsersByRole(int roleValue)
         {
-            var user = _userManager.Users.FirstOrDefault(c => c.Id == _userContextService.GetUserId);
+            if(new []{1,2,3}.Contains(roleValue))
+            {
+                var usersWithRoles = await _dbContext.Users.FromSqlRaw("SELECT * FROM AspNetUsers WHERE UserType=@roleValue", new SqlParameter("@roleValue", roleValue)).ToListAsync();
+                var result = _mapper.Map<List<UserDto>>(usersWithRoles);
+                return Ok(result);
+            }
+            else
+            {
+                var allUsers = await _dbContext.Users.ToListAsync();
+                var result = _mapper.Map<List<UserDto>>(allUsers);
+                return Ok(result);
+            }
+            
+        }
+
+        [HttpGet("users/current")]
+        async public Task<ActionResult<UserDto>> GetCurrentUser()
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(c => c.Id == _userContextService.GetUserId);
             if(user is null)
             {
                 throw new NotFoundException("User not found");
             }
             var result = _mapper.Map<UserDto>(user);
-            return result;
+            return Ok(result);
         }
 
         [HttpGet("users/{id}")]

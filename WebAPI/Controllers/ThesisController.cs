@@ -39,6 +39,14 @@ namespace WebAPI.Controllers
 
             return Ok(thesis);
         }
+        [HttpGet]
+        [Route("user/{userId}")]
+        public ActionResult<ThesisDto> GetFromUserId([FromRoute] int departmentId, [FromRoute] int userId)
+        {
+            var thesis = _thesisService.GetByUserId(departmentId,userId);
+
+            return Ok(thesis);
+        }
 
         [HttpPut]
         [Route("{thesisId}")]

@@ -51,6 +51,21 @@ namespace WebAPI.Services
 
         }
 
+        public ThesisDto GetByUserId(int departmentId, int userId)
+        {
+            var departments = GetDepartmentById(departmentId);
+            if(departments is null)
+            {
+                throw new NotFoundException("Department not found");
+            }
+            var thesis = _dbContext
+                .Theses
+                .FirstOrDefault(t => t.StudentId == userId);
+
+            var dto = _mapper.Map<Thesis, ThesisDto>(thesis);
+            return dto;
+        }
+
         public int Create(int departmentId, ThesisDto dto)
         {
             var department = GetDepartmentById(departmentId);
@@ -128,6 +143,8 @@ namespace WebAPI.Services
         {
             
         }
+
+        
 
 
         private Department GetDepartmentById(int departmentId)
