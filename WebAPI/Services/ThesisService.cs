@@ -66,6 +66,21 @@ namespace WebAPI.Services
             return dto;
         }
 
+        public List<ThesisDto> GetByPromoterId(int departmentId, int userId)
+        {
+            var departments = GetDepartmentById(departmentId);
+            if(departments is null)
+            {
+                throw new NotFoundException("Department not found");
+            }
+            var theses = _dbContext
+                .Theses
+                .Where(c => c.DepartmentId == departmentId && c.PromoterId == userId);
+
+            var dto = _mapper.Map<List<ThesisDto>>(theses);
+            return dto;
+        }
+
         public int Create(int departmentId, ThesisDto dto)
         {
             var department = GetDepartmentById(departmentId);

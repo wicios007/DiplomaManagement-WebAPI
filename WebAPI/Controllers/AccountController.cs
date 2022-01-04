@@ -219,7 +219,8 @@ namespace WebAPI.Controllers
                 {
                     access_token = encodedJwt,
                     expires_in = token.ValidTo.ToString("yyyy-MM-ddTHH:mm:ss"),
-                    user_role = role.First()
+                    user_role = role.First(),
+                    id = userId
                 };
                 return Ok(response);
             }
