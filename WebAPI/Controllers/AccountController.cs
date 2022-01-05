@@ -254,6 +254,15 @@ namespace WebAPI.Controllers
             var result = _mapper.Map<List<UserDto>>(users);
             return result;
         }
+        [HttpGet("users/department/{departmentId}")]
+        async public Task<ActionResult<List<UserDto>>> GetUsersFromDepartment(int departmentId, int roleValue)
+        {
+            //SqlParameter[] sqlParameters = { new SqlParameter("@roleValue", roleValue), new SqlParameter("@departmentId", departmentId) };
+            var users = await _dbContext.Users.FromSqlRaw("SELECT * FROM AspNetUsers WHERE UserType=@roleValue AND DepartmentId=@departmentId", new SqlParameter("@roleValue", roleValue), new SqlParameter("@departmentId", departmentId)).ToListAsync();
+
+            var result = _mapper.Map<List<UserDto>>(users);
+            return Ok(result);
+        }
 
         [HttpGet("usersByRole")]
         async public Task<ActionResult<List<UserDto>>> GetUsersByRole(int roleValue)
