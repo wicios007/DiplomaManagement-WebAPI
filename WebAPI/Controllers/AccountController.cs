@@ -30,27 +30,13 @@ namespace WebAPI.Controllers
     public class AccountController : Controller
     {
         private readonly ILogger _logger;
-        private readonly IMapper _mapper;
-        private readonly JwtOptionsDto _jwtOptions;
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Role> _roleManager;
         private readonly IEmailSenderService _emailSenderService;
-        private readonly IUserContextService _userContextService;
-        private readonly DiplomaManagementDbContext _dbContext;
         private readonly IAccountService _accountService;
 
-        public AccountController(ILogger<AccountController> logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager, IEmailSenderService emailSenderService, IUserContextService userContextService, DiplomaManagementDbContext dbContext, IAccountService accountService)
+        public AccountController(ILogger<AccountController> logger, IEmailSenderService emailSenderService, IAccountService accountService)
         {
             _logger = logger;
-            _mapper = mapper;
-            _jwtOptions = jwtOptions?.Value;
-            _signInManager = signInManager;
-            _userManager = userManager;
-            _roleManager = roleManager;
             _emailSenderService = emailSenderService;
-            _userContextService = userContextService;
-            _dbContext = dbContext;
             _accountService = accountService;
         }
         [Authorize(Roles = "Admin")]
