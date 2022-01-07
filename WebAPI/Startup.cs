@@ -79,7 +79,7 @@ namespace WebAPI
 
             services.AddScoped<IProposedThesisService, ProposedThesisService>();
             services.AddScoped<IProposedThesisCommentService, ProposedThesisCommentService>();
-            //services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ErrorHandlingMiddleware>();
             services.AddScoped<RequestTimeMiddleware>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();

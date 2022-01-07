@@ -38,8 +38,9 @@ namespace WebAPI.Controllers
         private readonly IEmailSenderService _emailSenderService;
         private readonly IUserContextService _userContextService;
         private readonly DiplomaManagementDbContext _dbContext;
+        private readonly IAccountService _accountService;
 
-        public AccountController(ILogger<AccountController> logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager, IEmailSenderService emailSenderService, IUserContextService userContextService, DiplomaManagementDbContext dbContext)
+        public AccountController(ILogger<AccountController> logger, IMapper mapper, IOptions<JwtOptionsDto> jwtOptions, SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager, IEmailSenderService emailSenderService, IUserContextService userContextService, DiplomaManagementDbContext dbContext, IAccountService accountService)
         {
             _logger = logger;
             _mapper = mapper;
@@ -50,192 +51,37 @@ namespace WebAPI.Controllers
             _emailSenderService = emailSenderService;
             _userContextService = userContextService;
             _dbContext = dbContext;
+            _accountService = accountService;
         }
         [Authorize(Roles = "Admin")]
         [HttpPost("register")]
         public async Task<ActionResult> RegisterUser([FromBody] RegisterUserDto dto)
         {
-            try
+            if(dto is null || ModelState == null || !ModelState.IsValid)
             {
-                if (dto == null || ModelState == null || !ModelState.IsValid)
-                {
-                    _logger.LogInformation($"Model is invalid");
-                    return BadRequest("Invalid data");
-                }
-
-
-                switch (dto.RoleId)
-                {
-                    case (int)RoleValue.User:
-                        {
-                            var user = new User()
-                            {
-                                UserName = dto.Email,
-                                Email = dto.Email,
-                                FirstName = dto.FirstName,
-                                LastName = dto.LastName,
-                                RegistrationDate = DateTime.Now
-                            };
-                            var result = await _userManager.CreateAsync(user, dto.Password);
-
-                            if (result.Succeeded)
-                            {
-                                await _userManager.AddToRoleAsync(user, "User");
-                                _logger.LogInformation("New user created");
-                                return Created("User created", null);
-                            }
-
-                            return BadRequest();
-                        }
-                    case (int)RoleValue.Promoter:
-                        {
-                            var promoter = new Promoter()
-                            {
-                                UserName = dto.Email,
-                                Email = dto.Email,
-                                FirstName = dto.FirstName,
-                                LastName = dto.LastName,
-                                RegistrationDate = DateTime.Now,
-                                Title = dto.PromoterTitle,
-                                DepartmentId = dto.DepartmentId
-                            };
-                            var result = await _userManager.CreateAsync(promoter, dto.Password);
-                            
-                            if (result.Succeeded)
-                            {
-                                await _userManager.AddToRoleAsync(promoter, "Promoter");
-                                _logger.LogInformation("New promoter created");
-                                return Created("Promoter created", null);
-                            }
-                            else
-                            {
-                                _logger.LogInformation("Error creating new promoter");
-                                return BadRequest("Promoter not created");
-                            }
-
-                        }
-                    case (int)RoleValue.Student:
-                        {
-                            var student = new Student()
-                            {
-                                UserName = dto.Email,
-                                Email = dto.Email,
-                                FirstName = dto.FirstName,
-                                LastName = dto.LastName,
-                                RegistrationDate = DateTime.Now,
-                                IndexNumber = dto.StudentIndexNumber,
-                                DepartmentId = dto.DepartmentId
-                            };
-                            var result = await _userManager.CreateAsync(student, dto.Password);
-                            if (result.Succeeded)
-                            {
-                                await _userManager.AddToRoleAsync(student, "Student");
-                                _logger.LogInformation("New student created");
-                                return Created("Student created", null);
-                            }
-                            else
-                            {
-                                _logger.LogInformation("Error creating new student");
-                                return BadRequest("Student not created");
-                            }
-                        }
-                    case (int)RoleValue.Admin:
-                        {
-                            var admin = new Admin()
-                            {
-                                UserName = dto.Email,
-                                Email = dto.Email,
-                                FirstName = dto.FirstName,
-                                LastName = dto.LastName,
-                                RegistrationDate = DateTime.Now
-                            };
-                            var result = await _userManager.CreateAsync(admin, dto.Password);
-                            if (result.Succeeded)
-                            {
-                                await _userManager.AddToRoleAsync(admin, "Admin");
-                                _logger.LogInformation("New admin created");
-                                return Created("Admin created", null);
-                            }
-                            else
-                            {
-                                _logger.LogInformation("Error creating new admin");
-                                return BadRequest("Admin not created");
-                            }
-                        }
-
-                }
-                return BadRequest();
-
+                _logger.LogInformation($"Model is invalid");
+                return BadRequest("Invalid data");
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest($"Error occurred");
-            }
-
+            var newUserId = await _accountService.RegisterUser(dto);
+            return Created($"api/account/users/{newUserId}", null);
         }
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginUserDto dto)
         {
-            try
+            if (dto is null || ModelState is null || !ModelState.IsValid)
             {
-                if (dto is null || ModelState is null || !ModelState.IsValid)
-                {
-                    _logger.LogInformation($"Model is invalid");
-                    return BadRequest("Invalid credentials or model");
-                }
-
-                var result = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, true, false);
-                if (!result.Succeeded)
-                {
-                    _logger.LogInformation($"Invalid email {dto.Email} or password {dto.Password}");
-                    return BadRequest("Niepoprawne dane logowania");
-                }
-
-                var user = await _userManager.FindByEmailAsync(dto.Email);
-                var userRoles = await _userManager.GetRolesAsync(user);
-
-                var userId = user.Id;
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, dto.Email),
-                    new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Nbf,
-                        new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Exp,
-                        ((long) ((DateTime.Now.AddMinutes(_jwtOptions.TokenExpirationMinutes) -
-                                  new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds)).ToString()),
-                };
-                claims.AddRange(userRoles.Select(ur => new Claim(ClaimTypes.Role, ur)));
-
-                var role = userRoles.Select(ur => new Claim(ClaimTypes.Role, ur)).Select(u => u.Value);
-
-                var token = new JwtSecurityToken(
-                    new JwtHeader(new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
-                        SecurityAlgorithms.HmacSha256)), new JwtPayload(claims));
-                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(token);
-                var response = new
-                {
-                    access_token = encodedJwt,
-                    expires_in = token.ValidTo.ToString("yyyy-MM-ddTHH:mm:ss"),
-                    user_role = role.First(),
-                    id = userId
-                };
-                return Ok(response);
+                _logger.LogInformation($"Model is invalid");
+                return BadRequest("Invalid credentials or model");
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest("Error occurred");
-            }
+            var response = await _accountService.Login(dto);
+            return Ok(response);
         }
-        //[AllowAnonymous]
         [HttpPost("send")]
         public async Task<ActionResult> SendEmail([FromBody] SendEmailDto dto)
         {
             if(ModelState == null || !ModelState.IsValid)
             {
+                _logger.LogInformation($"Model or DTO is invalid");
                 return BadRequest("Model error");
             }
             await _emailSenderService.SendEmailAsync(dto.DestId, dto.Subject, dto.Content);
@@ -244,69 +90,43 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("users")]
-        async public Task<List<UserDto>> GetUsers(){
-            var users = await _userManager
-                .Users
-                .Include(c => c.Student)
-                .Include(c => c.Promoter) //TODO: 
-                .ToListAsync();
-                        
-            var result = _mapper.Map<List<UserDto>>(users);
-            return result;
+        async public Task<ActionResult<List<UserDto>>> GetUsers(){
+            var result = await _accountService.GetUsers();
+            return Ok(result);
         }
         [HttpGet("users/department/{departmentId}")]
         async public Task<ActionResult<List<UserDto>>> GetUsersFromDepartment(int departmentId, int roleValue)
         {
-            //SqlParameter[] sqlParameters = { new SqlParameter("@roleValue", roleValue), new SqlParameter("@departmentId", departmentId) };
-            var users = await _dbContext.Users.FromSqlRaw("SELECT * FROM AspNetUsers WHERE UserType=@roleValue AND DepartmentId=@departmentId", new SqlParameter("@roleValue", roleValue), new SqlParameter("@departmentId", departmentId)).ToListAsync();
-
-            var result = _mapper.Map<List<UserDto>>(users);
+            var result = await _accountService.GetUsersFromDepartment(departmentId, roleValue);
             return Ok(result);
         }
 
         [HttpGet("usersByRole")]
         async public Task<ActionResult<List<UserDto>>> GetUsersByRole(int roleValue)
         {
-            if(new []{1,2,3}.Contains(roleValue))
-            {
-                var usersWithRoles = await _dbContext.Users.FromSqlRaw("SELECT * FROM AspNetUsers WHERE UserType=@roleValue", new SqlParameter("@roleValue", roleValue)).ToListAsync();
-                var result = _mapper.Map<List<UserDto>>(usersWithRoles);
-                return Ok(result);
-            }
-            else
-            {
-                var allUsers = await _dbContext.Users.ToListAsync();
-                var result = _mapper.Map<List<UserDto>>(allUsers);
-                return Ok(result);
-            }
-            
+            var result = await _accountService.GetUsersByRole(roleValue);
+            return Ok(result);
         }
 
         [HttpGet("users/current")]
         async public Task<ActionResult<UserDto>> GetCurrentUser()
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(c => c.Id == _userContextService.GetUserId);
-            if(user is null)
-            {
-                throw new NotFoundException("User not found");
-            }
-            var result = _mapper.Map<UserDto>(user);
+            var result = await _accountService.GetCurrentUser();
             return Ok(result);
         }
 
         [HttpGet("users/{id}")]
-        public ActionResult<UserDto> GetUserById(int id)
+        async public Task<ActionResult<UserDto>> GetUserById(int id)
         {
-            var user = _userManager.Users.FirstOrDefault(c => c.Id == id);
-            var result = _mapper.Map<UserDto>(user);
+            var result = await _accountService.GetUserById(id);
             return Ok(result);
         }
 
         [HttpGet("roles")]
-        public ActionResult<List<Role>> GetRoles()
+        async public Task<ActionResult<List<Role>>> GetRoles()
         {
-            var roles = _roleManager.Roles.ToList();
-            return Ok(roles);
+            var result = await _accountService.GetRoles();
+            return Ok(result);
         }
     }
 }
