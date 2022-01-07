@@ -269,13 +269,17 @@ namespace WebAPI.Services
             {
                 throw new NotFoundException("User not found");
             }
+            var role = await _userManager.GetRolesAsync(user);
             var result = _mapper.Map<UserDto>(user);
+            result.RoleName = role[0];
             return result;
         }
         public async Task<UserDto> GetUserById(int id)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(c => c.Id == id);
+            var role = await _userManager.GetRolesAsync(user);
             var result = _mapper.Map<UserDto>(user);
+            result.RoleName = role[0];
             return result;
         }
         public async Task<List<Role>> GetRoles()

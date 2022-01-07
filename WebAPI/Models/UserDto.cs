@@ -15,6 +15,7 @@ namespace WebAPI.Models
         public int DepartmentId{get;set;}
         public string IndexNumber{get;set;}
         public string Title{get;set;}
+        public string RoleName{get;set;}
 
     }
 }

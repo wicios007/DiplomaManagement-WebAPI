@@ -44,9 +44,23 @@ namespace WebAPI
                         _dbContext.ProposedTheses.AddRange(propTheses);
                         _dbContext.SaveChanges();
                     }
+                    if (!_roleManager.Roles.Any())
+                    {
+                        IEnumerable<Role> roles = GetRoles();
+                        foreach(var item in roles)
+                        {
+                            _roleManager.CreateAsync(item);
+                        }
+                        _dbContext.SaveChanges();
+
+                    }
+                    if (!_userManager.Users.Any())
+                    {
+
+                    }
 
                 }
-                SeedRoles();
+                //SeedRoles();
                 SeedAdmin();
 
             }
@@ -73,6 +87,46 @@ namespace WebAPI
                     var result2 = _userManager.AddToRoleAsync(admin, "Admin").Result;
                 }
             }
+        }
+
+        public static IEnumerable<Role> GetRoles()
+        {
+            var userRoleList = new List<Role>
+                {
+                    new Role
+                    {
+                        Id = 0,
+                        ConcurrencyStamp = Guid.NewGuid().ToString(),
+                        Name = "User",
+                        NormalizedName = "USER",
+                        RoleValue = RoleValue.User
+                    },
+                    new Role
+                    {
+                        Id = 1,
+                        ConcurrencyStamp = Guid.NewGuid().ToString(),
+                        Name = "Promoter",
+                        NormalizedName = "PROMOTER",
+                        RoleValue = RoleValue.Promoter
+                    },
+                    new Role
+                    {
+                        Id = 2,
+                        ConcurrencyStamp = Guid.NewGuid().ToString(),
+                        Name = "Student",
+                        NormalizedName = "STUDENT",
+                        RoleValue = RoleValue.Student
+                    },
+                    new Role
+                    {
+                        Id = 3,
+                        ConcurrencyStamp = Guid.NewGuid().ToString(),
+                        Name = "Admin",
+                        NormalizedName = "ADMIN",
+                        RoleValue = RoleValue.Admin
+                    }
+                };
+            return userRoleList;
         }
 
         public static void SeedRoles()
@@ -154,7 +208,6 @@ namespace WebAPI
                     NameEnglish = "Application for theses management",
                     Description =
                         "Stworzenie aplikacji do zarządzania pracami dyplomowymi z użyciem frameworków .NET 5.0 oraz Angular",
-                    //IsTaken = true
                 },
                 new Thesis()
                 {
@@ -162,7 +215,6 @@ namespace WebAPI
                     NameEnglish = "Sample",
                     Description =
                         "SAMPLE Stworzenie projektu sieci",
-                    //IsTaken = false
                 },
 
             };
