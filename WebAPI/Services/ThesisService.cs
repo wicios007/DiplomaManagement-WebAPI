@@ -154,9 +154,9 @@ namespace WebAPI.Services
             _dbContext.SaveChanges();
         }
 
-        public void GenerateCard(ThesisCardDto dto)
+        public void GenerateCard(int departmentId, int thesisId)
         {
-            
+
         }
 
         

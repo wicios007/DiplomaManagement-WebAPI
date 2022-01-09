@@ -23,10 +23,10 @@ namespace WebAPI.Services
 {
     public class LoginReturn
     {
-        public string Access_token{get;set;}
-        public string Expires_in {get;set;}
-        public string User_role{get;set;}
-        public int Id{get;set;}
+        public string Access_token { get; set; }
+        public string Expires_in { get; set; }
+        public string User_role { get; set; }
+        public int Id { get; set; }
     }
     public class AccountService : IAccountService
     {
@@ -55,147 +55,139 @@ namespace WebAPI.Services
 
         public async Task<int> RegisterUser(RegisterUserDto dto)
         {
-            try
+
+            if (dto == null)
             {
-                if (dto == null)
-                {
-                    _logger.LogInformation($"Model is invalid");
-                    throw new BadRequestException("Invalid data");
-                }
-
-
-                switch (dto.RoleId)
-                {
-                    case (int)RoleValue.User:
-                        {
-                            var user = new User()
-                            {
-                                UserName = dto.Email,
-                                Email = dto.Email,
-                                FirstName = dto.FirstName,
-                                LastName = dto.LastName,
-                                RegistrationDate = DateTime.Now
-                            };
-                            var result = await _userManager.CreateAsync(user, dto.Password);
-
-                            if (result.Succeeded)
-                            {
-                                await _userManager.AddToRoleAsync(user, "User");
-                                _logger.LogInformation("New user created");
-                               return user.Id;
-                            }
-                            _logger.LogInformation("Error creating new user");
-                            throw new BadRequestException("User not created");
-                        }
-                    case (int)RoleValue.Promoter:
-                        {
-                            var promoter = new Promoter()
-                            {
-                                UserName = dto.Email,
-                                Email = dto.Email,
-                                FirstName = dto.FirstName,
-                                LastName = dto.LastName,
-                                RegistrationDate = DateTime.Now,
-                                Title = dto.PromoterTitle,
-                                DepartmentId = dto.DepartmentId
-                            };
-                            var result = await _userManager.CreateAsync(promoter, dto.Password);
-                            
-                            if (result.Succeeded)
-                            {
-                                await _userManager.AddToRoleAsync(promoter, "Promoter");
-                                _logger.LogInformation("New promoter created");
-                                return promoter.Id;
-                            }
-                            else
-                            {
-                                _logger.LogInformation("Error creating new promoter");
-                                throw new BadRequestException("Promotor not created");
-                            }
-
-                        }
-                    case (int)RoleValue.Student:
-                        {
-                            var student = new Student()
-                            {
-                                UserName = dto.Email,
-                                Email = dto.Email,
-                                FirstName = dto.FirstName,
-                                LastName = dto.LastName,
-                                RegistrationDate = DateTime.Now,
-                                IndexNumber = dto.StudentIndexNumber,
-                                DepartmentId = dto.DepartmentId
-                            };
-                            var result = await _userManager.CreateAsync(student, dto.Password);
-                            if (result.Succeeded)
-                            {
-                                await _userManager.AddToRoleAsync(student, "Student");
-                                _logger.LogInformation("New student created");
-                                return student.Id;
-                            }
-                            else
-                            {
-                                _logger.LogInformation("Error creating new student");
-                                throw new BadRequestException("Student not created");
-                            }
-                        }
-                    case (int)RoleValue.Admin:
-                        {
-                            var admin = new Admin()
-                            {
-                                UserName = dto.Email,
-                                Email = dto.Email,
-                                FirstName = dto.FirstName,
-                                LastName = dto.LastName,
-                                RegistrationDate = DateTime.Now
-                            };
-                            var result = await _userManager.CreateAsync(admin, dto.Password);
-                            if (result.Succeeded)
-                            {
-                                await _userManager.AddToRoleAsync(admin, "Admin");
-                                _logger.LogInformation("New admin created");
-                               return admin.Id;
-                            }
-                            else
-                            {
-                                _logger.LogInformation("Error creating new admin");
-                                throw new BadRequestException("Admin not created");
-                            }
-                        }
-                }
-                return 0;
-
+                _logger.LogInformation($"Model is invalid");
+                throw new BadRequestException("Invalid data");
             }
-            catch (Exception e)
+
+
+            switch (dto.RoleId)
             {
-                _logger.LogError(e, e.Message);
-               throw new BadRequestException("Register user - Error occurred");
+                case (int)RoleValue.User:
+                    {
+                        var user = new User()
+                        {
+                            UserName = dto.Email,
+                            Email = dto.Email,
+                            FirstName = dto.FirstName,
+                            LastName = dto.LastName,
+                            RegistrationDate = DateTime.Now
+                        };
+                        var result = await _userManager.CreateAsync(user, dto.Password);
+
+                        if (result.Succeeded)
+                        {
+                            await _userManager.AddToRoleAsync(user, "User");
+                            _logger.LogInformation("New user created");
+                            return user.Id;
+                        }
+                        _logger.LogInformation("Error creating new user");
+                        throw new BadRequestException("User not created");
+                    }
+                case (int)RoleValue.Promoter:
+                    {
+                        var promoter = new Promoter()
+                        {
+                            UserName = dto.Email,
+                            Email = dto.Email,
+                            FirstName = dto.FirstName,
+                            LastName = dto.LastName,
+                            RegistrationDate = DateTime.Now,
+                            Title = dto.PromoterTitle,
+                            DepartmentId = dto.DepartmentId
+                        };
+                        var result = await _userManager.CreateAsync(promoter, dto.Password);
+
+                        if (result.Succeeded)
+                        {
+                            await _userManager.AddToRoleAsync(promoter, "Promoter");
+                            _logger.LogInformation("New promoter created");
+                            return promoter.Id;
+                        }
+                        else
+                        {
+                            _logger.LogInformation("Error creating new promoter");
+                            throw new BadRequestException("Promotor not created");
+                        }
+
+                    }
+                case (int)RoleValue.Student:
+                    {
+                        var student = new Student()
+                        {
+                            UserName = dto.Email,
+                            Email = dto.Email,
+                            FirstName = dto.FirstName,
+                            LastName = dto.LastName,
+                            RegistrationDate = DateTime.Now,
+                            IndexNumber = dto.StudentIndexNumber,
+                            DepartmentId = dto.DepartmentId
+                        };
+                        var result = await _userManager.CreateAsync(student, dto.Password);
+                        if (result.Succeeded)
+                        {
+                            await _userManager.AddToRoleAsync(student, "Student");
+                            _logger.LogInformation("New student created");
+                            return student.Id;
+                        }
+                        else
+                        {
+                            _logger.LogInformation("Error creating new student");
+                            throw new BadRequestException("Student not created");
+                        }
+                    }
+                case (int)RoleValue.Admin:
+                    {
+                        var admin = new Admin()
+                        {
+                            UserName = dto.Email,
+                            Email = dto.Email,
+                            FirstName = dto.FirstName,
+                            LastName = dto.LastName,
+                            RegistrationDate = DateTime.Now
+                        };
+                        var result = await _userManager.CreateAsync(admin, dto.Password);
+                        if (result.Succeeded)
+                        {
+                            await _userManager.AddToRoleAsync(admin, "Admin");
+                            _logger.LogInformation("New admin created");
+                            return admin.Id;
+                        }
+                        else
+                        {
+                            _logger.LogInformation("Error creating new admin");
+                            throw new BadRequestException("Admin not created");
+                        }
+                    }
             }
+            return 0;
+
         }
 
-         public async Task<LoginReturn> Login(LoginUserDto dto)
+        public async Task<LoginReturn> Login(LoginUserDto dto)
         {
-            try
+
+
+            if (dto is null)
             {
+                _logger.LogInformation($"Model is invalid");
+                throw new BadRequestException("Data object is invalid");
+            }
 
-                if (dto is null)
-                {
-                    _logger.LogInformation($"Model is invalid");
-                    throw new BadRequestException("Data object is invalid");
-                }
+            var result = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, true, false);
+            if (!result.Succeeded)
+            {
+                _logger.LogInformation($"Invalid email {dto.Email} or password {dto.Password}");
+                throw new BadRequestException("Niepoprawny login lub hasło");
+            }
 
-                var result = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, true, false);
-                if (!result.Succeeded)
-                {
-                    _logger.LogInformation($"Invalid email {dto.Email} or password {dto.Password}");
-                    throw new BadRequestException("Niepoprawne dane logowania");
-                }
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            var userRoles = await _userManager.GetRolesAsync(user);
 
-                var user = await _userManager.FindByEmailAsync(dto.Email);
-                var userRoles = await _userManager.GetRolesAsync(user);
-
-                var userId = user.Id;
-                var claims = new List<Claim>
+            var userId = user.Id;
+            var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, dto.Email),
                     new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
@@ -205,38 +197,34 @@ namespace WebAPI.Services
                         ((long) ((DateTime.Now.AddMinutes(_jwtOptions.TokenExpirationMinutes) -
                                   new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds)).ToString()),
                 };
-                claims.AddRange(userRoles.Select(ur => new Claim(ClaimTypes.Role, ur)));
+            claims.AddRange(userRoles.Select(ur => new Claim(ClaimTypes.Role, ur)));
 
-                var role = userRoles.Select(ur => new Claim(ClaimTypes.Role, ur)).Select(u => u.Value);
+            var role = userRoles.Select(ur => new Claim(ClaimTypes.Role, ur)).Select(u => u.Value);
 
-                var token = new JwtSecurityToken(
-                    new JwtHeader(new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
-                        SecurityAlgorithms.HmacSha256)), new JwtPayload(claims));
-                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(token);
-                var response = new LoginReturn()
-                {
-                    Access_token = encodedJwt,
-                    Expires_in = token.ValidTo.ToString("yyyy-MM-ddTHH:mm:ss"),
-                    User_role = role.First(),
-                    Id = userId
-                };
-                return response;
-            }
-            catch (Exception e)
+            var token = new JwtSecurityToken(
+                new JwtHeader(new SigningCredentials(
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
+                    SecurityAlgorithms.HmacSha256)), new JwtPayload(claims));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(token);
+            var response = new LoginReturn()
             {
-                _logger.LogError(e, e.Message);
-                throw new BadRequestException("Error occurred");
-            }
+                Access_token = encodedJwt,
+                Expires_in = token.ValidTo.ToString("yyyy-MM-ddTHH:mm:ss"),
+                User_role = role.First(),
+                Id = userId
+            };
+            return response;
+
         }
 
-        async public Task<List<UserDto>> GetUsers(){
+        async public Task<List<UserDto>> GetUsers()
+        {
             var users = await _userManager
                 .Users
                 .Include(c => c.Student)
                 .Include(c => c.Promoter) //TODO: 
                 .ToListAsync();
-                        
+
             var result = _mapper.Map<List<UserDto>>(users);
             return result;
         }
@@ -249,7 +237,7 @@ namespace WebAPI.Services
         }
         async public Task<List<UserDto>> GetUsersByRole(int roleValue)
         {
-            if(new []{1,2,3}.Contains(roleValue))
+            if (new[] { 1, 2, 3 }.Contains(roleValue))
             {
                 var usersWithRoles = await _dbContext.Users.FromSqlRaw("SELECT * FROM AspNetUsers WHERE UserType=@roleValue", new SqlParameter("@roleValue", roleValue)).ToListAsync();
                 var result = _mapper.Map<List<UserDto>>(usersWithRoles);
@@ -265,7 +253,7 @@ namespace WebAPI.Services
         async public Task<UserDto> GetCurrentUser()
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(c => c.Id == _userContextService.GetUserId);
-            if(user is null)
+            if (user is null)
             {
                 throw new NotFoundException("User not found");
             }

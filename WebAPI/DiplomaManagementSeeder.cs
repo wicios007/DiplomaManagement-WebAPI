@@ -31,20 +31,7 @@ namespace WebAPI
  /*               var pendingMigrations = _dbContext.Database.GetPendingMigrations();
                 if (pendingMigrations != null && pendingMigrations.Any())*/
                 {
-
-                    if (!_dbContext.Theses.Any())
-                    {
-                        IEnumerable<Thesis> theses = GetTheses();
-                        _dbContext.Theses.AddRange(theses);
-                        _dbContext.SaveChanges();
-                    }
-                    if (!_dbContext.ProposedTheses.Any())
-                    {
-                        IEnumerable<ProposedThese> propTheses = GetProposedTheses();
-                        _dbContext.ProposedTheses.AddRange(propTheses);
-                        _dbContext.SaveChanges();
-                    }
-                    if (!_roleManager.Roles.Any())
+                     if (!_roleManager.Roles.Any())
                     {
                         IEnumerable<Role> roles = GetRoles();
                         foreach(var item in roles)
@@ -58,6 +45,19 @@ namespace WebAPI
                     {
 
                     }
+                    if (!_dbContext.Theses.Any())
+                    {
+                        IEnumerable<Thesis> theses = GetTheses();
+                        _dbContext.Theses.AddRange(theses);
+                        _dbContext.SaveChanges();
+                    }
+                    if (!_dbContext.ProposedTheses.Any())
+                    {
+                        IEnumerable<ProposedThese> propTheses = GetProposedTheses();
+                        _dbContext.ProposedTheses.AddRange(propTheses);
+                        _dbContext.SaveChanges();
+                    }
+                   
 
                 }
                 //SeedRoles();
@@ -220,6 +220,7 @@ namespace WebAPI
             };
             return theses;
         }
+
 
         
     }
