@@ -45,6 +45,15 @@ namespace WebAPI
             CreateMap<Thesis, ProposedThese>();
             CreateMap<ThesisDto, ProposedThese>();
             CreateMap<ProposedThese, ThesisDto>();
+
+            CreateMap<CreateThesisDto, ProposedThese>();
+            CreateMap<ProposedThese, CreateThesisDto>();
+
+            CreateMap<ThesisDto, CreateThesisDto>();
+            CreateMap<CreateThesisDto, ThesisDto>();
+
+            CreateMap<CreateThesisDto, Thesis>();
+            CreateMap<Thesis, CreateThesisDto>();
         }
         
     }

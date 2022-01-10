@@ -14,165 +14,46 @@ namespace WebAPI
     public class DiplomaManagementSeeder
     {
         private readonly DiplomaManagementDbContext _dbContext;
-        private static UserManager<User> _userManager;
-        private static RoleManager<Role> _roleManager;
 
-        public DiplomaManagementSeeder(DiplomaManagementDbContext dbContext, UserManager<User> userManager, RoleManager<Role> roleManager)
+        public DiplomaManagementSeeder(DiplomaManagementDbContext dbContext)
         {
             _dbContext = dbContext;
-            _userManager = userManager;
-            _roleManager = roleManager;
         }
 
         public void Seed()
         {
             if (_dbContext.Database.CanConnect())
             {
- /*               var pendingMigrations = _dbContext.Database.GetPendingMigrations();
-                if (pendingMigrations != null && pendingMigrations.Any())*/
-                {
-                     if (!_roleManager.Roles.Any())
+                    if (!_dbContext.Departments.Any())
                     {
-                        IEnumerable<Role> roles = GetRoles();
-                        foreach(var item in roles)
-                        {
-                            _roleManager.CreateAsync(item);
-                        }
-                        _dbContext.SaveChanges();
-
-                    }
-                    if (!_userManager.Users.Any())
-                    {
-
-                    }
-                    if (!_dbContext.Theses.Any())
-                    {
-                        IEnumerable<Thesis> theses = GetTheses();
-                        _dbContext.Theses.AddRange(theses);
+                        IEnumerable<Department> departments = GetDepartments();
+                        _dbContext.Departments.AddRange(departments);
                         _dbContext.SaveChanges();
                     }
-                    if (!_dbContext.ProposedTheses.Any())
-                    {
-                        IEnumerable<ProposedThese> propTheses = GetProposedTheses();
-                        _dbContext.ProposedTheses.AddRange(propTheses);
-                        _dbContext.SaveChanges();
-                    }
-                   
-
-                }
-                //SeedRoles();
-                SeedAdmin();
-
             }
         }
 
-        public static void SeedAdmin()
+        private static IEnumerable<Department> GetDepartments()
         {
-            if(_userManager.FindByEmailAsync("admin@admin.com").Result == null)
+            var departments = new List<Department>()
             {
-                var admin = new Admin
+                new Department()
                 {
-                    UserName = "admin@admin.com",
-                    Email = "admin@admin.com",
-                    NormalizedUserName = "ADMIN@ADMIN.COM",
-                    NormalizedEmail = "ADMIN@ADMIN.COM",
-                    SecurityStamp = Guid.NewGuid().ToString(),
-                    RegistrationDate = DateTime.Now
-
-                };
-                var password = "Admin1234";
-                var result = _userManager.CreateAsync(admin, password).Result;
-                if (result.Succeeded)
+                    Name = "Wydział Inżynierii Mechanicznej i Informatyki",
+                    Initials = "WIMII"
+                },
+                new Department()
                 {
-                    var result2 = _userManager.AddToRoleAsync(admin, "Admin").Result;
-                }
-            }
-        }
-
-        public static IEnumerable<Role> GetRoles()
-        {
-            var userRoleList = new List<Role>
+                    Name = "Wydział Inżynierii Produkcji",
+                    Initials = "WIP"
+                },
+                new Department()
                 {
-                    new Role
-                    {
-                        Id = 0,
-                        ConcurrencyStamp = Guid.NewGuid().ToString(),
-                        Name = "User",
-                        NormalizedName = "USER",
-                        RoleValue = RoleValue.User
-                    },
-                    new Role
-                    {
-                        Id = 1,
-                        ConcurrencyStamp = Guid.NewGuid().ToString(),
-                        Name = "Promoter",
-                        NormalizedName = "PROMOTER",
-                        RoleValue = RoleValue.Promoter
-                    },
-                    new Role
-                    {
-                        Id = 2,
-                        ConcurrencyStamp = Guid.NewGuid().ToString(),
-                        Name = "Student",
-                        NormalizedName = "STUDENT",
-                        RoleValue = RoleValue.Student
-                    },
-                    new Role
-                    {
-                        Id = 3,
-                        ConcurrencyStamp = Guid.NewGuid().ToString(),
-                        Name = "Admin",
-                        NormalizedName = "ADMIN",
-                        RoleValue = RoleValue.Admin
-                    }
-                };
-            return userRoleList;
-        }
-
-        public static void SeedRoles()
-        {
-            if (!_roleManager.Roles.Any())
-            {
-                var userRoleList = new List<Role>
-                {
-                    new Role
-                    {
-                        Id = 0,
-                        ConcurrencyStamp = Guid.NewGuid().ToString(),
-                        Name = "User",
-                        NormalizedName = "USER",
-                        RoleValue = RoleValue.User
-                    },
-                    new Role
-                    {
-                        Id = 1,
-                        ConcurrencyStamp = Guid.NewGuid().ToString(),
-                        Name = "Promoter",
-                        NormalizedName = "PROMOTER",
-                        RoleValue = RoleValue.Promoter
-                    },
-                    new Role
-                    {
-                        Id = 2,
-                        ConcurrencyStamp = Guid.NewGuid().ToString(),
-                        Name = "Student",
-                        NormalizedName = "STUDENT",
-                        RoleValue = RoleValue.Student
-                    },
-                    new Role
-                    {
-                        Id = 3,
-                        ConcurrencyStamp = Guid.NewGuid().ToString(),
-                        Name = "Admin",
-                        NormalizedName = "ADMIN",
-                        RoleValue = RoleValue.Admin
-                    }
-                };
-                foreach (var item in userRoleList)
-                {
-                    _roleManager.CreateAsync(item);
-                }
-            }
+                    Name = "Wydział Budownictwa",
+                    Initials = "WB"
+                },
+            };
+            return departments;
         }
 
         private static IEnumerable<ProposedThese> GetProposedTheses()

@@ -120,20 +120,22 @@ namespace WebAPI
 
             
 
-             services.AddCors(options =>
+/*             services.AddCors(options =>
             {
                 options.AddPolicy("DiplomaManagementClient", builder =>
                 {
                     //var origins = Configuration["AllowedOrigins"].Split(';');
                     builder
                         .AllowAnyMethod()
-                        .SetIsOriginAllowed(origin =>
-                            true) //tutaj pozwala na dostêp z ka¿dego linku, powinno byæ inaczej !!!
+                        //.AllowAnyOrigin()
+                        //.WithOrigins("http://localhost:4200")
+                        
+                        .SetIsOriginAllowed(origin => true)
                         .AllowAnyHeader()
                         .AllowCredentials();
                     //.WithOrigins(Configuration["AllowedOrigins"]);
                 });
-            });
+            });*/
             
 
 
@@ -144,7 +146,7 @@ namespace WebAPI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DiplomaManagementSeeder seeder)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<User> userManager, RoleManager<Role> roleManager, DiplomaManagementSeeder seeder)
         {
             app.UseStaticFiles();
             app.UseCors("DiplomaManagementClient");
@@ -156,7 +158,18 @@ namespace WebAPI
 
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseMiddleware<RequestTimeMiddleware>();
+
+            app.UseCors(options =>
+            {
+                options.SetIsOriginAllowed(origin => true)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+            });
+
             app.UseAuthentication();
+
+            DiplomaManagementUserSeeder.SeedData(userManager, roleManager);
+
             app.UseHttpsRedirection();
             app.UseSwagger();
             app.UseSwaggerUI(c =>

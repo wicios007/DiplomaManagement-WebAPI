@@ -41,7 +41,7 @@ namespace WebAPI.Controllers
             return Ok();
         }
         [HttpPost]
-        public ActionResult<ProposedThesisDto> Create([FromRoute]int departmentId, ProposedThesisDto dto) //TODO:czy to tak powinno byc?
+        public ActionResult<ProposedThesisDto> Create([FromRoute]int departmentId, ProposedThesisDto dto)
         {
             var id = proposedThesisService.Create(dto);
             return Created($"api/department/{departmentId}/proposedThesis/{id}", null);

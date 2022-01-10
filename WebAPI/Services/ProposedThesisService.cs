@@ -95,8 +95,15 @@ namespace WebAPI.Services
                 throw new NotFoundException("Department not found");
             }
             
-            var acceptedThesisDto = mapper.Map<ThesisDto>(propThese);
+            //old
+            //var acceptedThesisDto = mapper.Map<ThesisDto>(propThese);
+            //var acceptedThesis = mapper.Map<Thesis>(acceptedThesisDto);
+            
+            var createThesisDto = mapper.Map<CreateThesisDto>(propThese);
+            var acceptedThesisDto = mapper.Map<ThesisDto>(createThesisDto);
             var acceptedThesis = mapper.Map<Thesis>(acceptedThesisDto);
+            
+            
             var promoter = userManager.Users.FirstOrDefault(c => c.Id == userContextService.GetUserId);
             if(promoter is null)
             {
@@ -106,7 +113,6 @@ namespace WebAPI.Services
             acceptedThesis.PromoterId = userContextService.GetUserId;
             acceptedThesis.Department = department;
             acceptedThesis.DepartmentId = department.Id;
-
             
             dbContext.Theses.Add(acceptedThesis);
 
