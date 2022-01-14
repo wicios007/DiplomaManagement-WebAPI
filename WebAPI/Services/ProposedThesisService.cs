@@ -39,10 +39,34 @@ namespace WebAPI.Services
             ProposedThese propThese = mapper.Map<ProposedThese>(dto);
             propThese.CreatedById = userContextService.GetUserId;
             var user = userManager.Users.FirstOrDefault(c => c.Id == userContextService.GetUserId);
-            propThese.Student = (Student)user;
-            propThese.StudentId = user.Id;
+
+            var currentUser = userContextService.User;
+
+            if (currentUser.IsInRole("Promoter"))
+            {
+                propThese.Promoter = (Promoter)user;
+                propThese.PromoterId = user.Id;
+                propThese.Student = null;
+                propThese.StudentId = null;
+
+            }else if (currentUser.IsInRole("Student"))
+            {
+                propThese.Student = (Student)user;
+                propThese.StudentId = user.Id;
+                propThese.Promoter = null;
+                propThese.StudentId = null;
+            }
+            else
+            {
+                throw new BadRequestException("User is not a promoter or student");
+            }
+            
 
             var department = dbContext.Departments.FirstOrDefault(c => c.Id == user.DepartmentId);
+            if(department is null)
+            {
+                throw new NotFoundException("Department not found");
+            }
             propThese.Department = department;
             propThese.DepartmentId = department.Id;
             
@@ -104,13 +128,28 @@ namespace WebAPI.Services
             var acceptedThesis = mapper.Map<Thesis>(acceptedThesisDto);
             
             
-            var promoter = userManager.Users.FirstOrDefault(c => c.Id == userContextService.GetUserId);
-            if(promoter is null)
+            var user = userManager.Users.FirstOrDefault(c => c.Id == userContextService.GetUserId);
+            var currentUser = userContextService.User;
+            if (currentUser.IsInRole("Promoter"))
             {
-                throw new NotFoundException("Promoter not found");
+                acceptedThesis.Promoter = (Promoter)user;
+                acceptedThesis.PromoterId = user.Id;
+
+            }else if (currentUser.IsInRole("Student"))
+            {
+                acceptedThesis.Student = (Student)user;
+                acceptedThesis.StudentId = user.Id;
             }
-            acceptedThesis.Promoter = (Promoter)promoter;
-            acceptedThesis.PromoterId = userContextService.GetUserId;
+            else
+            {
+                throw new BadRequestException("Użytkownik nie jest promoterem ani studentem");
+            }
+            if(user is null)
+            {
+                throw new NotFoundException("User not found");
+            }
+/*            acceptedThesis.Promoter = (Promoter)promoter;
+            acceptedThesis.PromoterId = userContextService.GetUserId;*/
             acceptedThesis.Department = department;
             acceptedThesis.DepartmentId = department.Id;
             
@@ -135,6 +174,12 @@ namespace WebAPI.Services
         {
             var propTheses = dbContext.ProposedTheses.Where(c => c.StudentId == studentId).ToList();
             //var propTheses = dbContext.ProposedTheses.All(c => c.StudentId == studentId);
+            var result = mapper.Map<List<ProposedThesisDto>>(propTheses);
+            return result;
+        }
+        public List<ProposedThesisDto> GetByPromoterId(int departmentId, int promoterId)
+        {
+            var propTheses = dbContext.ProposedTheses.Where(c => c.PromoterId == promoterId).ToList();
             var result = mapper.Map<List<ProposedThesisDto>>(propTheses);
             return result;
         }

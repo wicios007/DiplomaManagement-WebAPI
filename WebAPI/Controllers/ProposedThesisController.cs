@@ -60,10 +60,17 @@ namespace WebAPI.Controllers
             var result = proposedThesisService.GetByStudentId(departmentId, studentId);
             return Ok(result);
         }
+        [HttpGet]
+        [Route("promoter/{promoterId}")]
+        public ActionResult<List<ProposedThesisDto>> GetByPromoterId([FromRoute] int departmentId, [FromRoute] int promoterId)
+        {
+            var result = proposedThesisService.GetByPromoterId(departmentId, promoterId);
+            return Ok(result);
+        }
 
         [HttpPost]
         [Route("{proposedThesisId}/accept")]
-        [Authorize(Roles = "Promoter")]
+        [Authorize(Roles = "Promoter, Student")]
         public ActionResult AcceptThesis([FromRoute] int departmentId, [FromRoute] int proposedThesisId)
         {
             var acceptedId = proposedThesisService.Accept(departmentId, proposedThesisId);

@@ -18,9 +18,9 @@ namespace WebAPI.Entities
         public int? CreatedById{get;set;}
         public virtual User CreatedBy{get;set;}
         public int? StudentId { get; set; }
-        public virtual Student? Student { get; set; }
-/*        public int? PromoterId{get;set;}
-        public virtual Promoter? Promoter{get;set;}*/
+        public virtual Student Student { get; set; }
+        public int? PromoterId{get;set;}
+        public virtual Promoter Promoter{get;set;}
         public int? DepartmentId{get;set;}
         public virtual Department Department{get;set;}
         public List<ProposedTheseComment> Comments { get; set; }

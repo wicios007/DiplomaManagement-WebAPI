@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Entities;
 
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(DiplomaManagementDbContext))]
-    partial class DiplomaManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220114093653_AddedListOfProposedThesesToPromoter")]
+    partial class AddedListOfProposedThesesToPromoter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -475,7 +477,7 @@ namespace WebAPI.Migrations
                         .HasForeignKey("DepartmentId");
 
                     b.HasOne("WebAPI.Entities.Promoter", "Promoter")
-                        .WithMany("ProposedThesesList")
+                        .WithMany("ProposedTheses")
                         .HasForeignKey("PromoterId");
 
                     b.HasOne("WebAPI.Entities.Student", "Student")
@@ -597,7 +599,7 @@ namespace WebAPI.Migrations
 
             modelBuilder.Entity("WebAPI.Entities.Promoter", b =>
                 {
-                    b.Navigation("ProposedThesesList");
+                    b.Navigation("ProposedTheses");
 
                     b.Navigation("Theses");
                 });

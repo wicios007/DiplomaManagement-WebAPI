@@ -11,6 +11,7 @@ namespace WebAPI.Entities
         public string Title { get; set; }
 /*        public int? DepartmentId{get;set;}
         public virtual Department Department{get;set;}*/
+        public List<ProposedThese> ProposedThesesList {get;set;}
         public List<Thesis> Theses { get; set; }
 
     }
