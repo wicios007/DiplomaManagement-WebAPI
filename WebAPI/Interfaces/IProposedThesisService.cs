@@ -18,5 +18,6 @@ namespace WebAPI.Interfaces
         List<ProposedThesisDto> GetAllFromDepartment(int departmentId);
         List<ProposedThesisDto> GetByStudentId(int departmentId, int studentId);
         List<ProposedThesisDto> GetByPromoterId(int departmentId, int promoterId);
+        List<ProposedThesisDto> GetAddedByPromoters(int departmentId);
     }
 }

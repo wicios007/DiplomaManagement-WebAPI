@@ -196,6 +196,17 @@ namespace WebAPI.Services
             return result;
         }
 
+        public List<ProposedThesisDto> GetAddedByPromoters(int departmentId)
+        {
+            var propTheses = dbContext.ProposedTheses.Where(c => c.PromoterId != null && c.DepartmentId == departmentId && c.IsAccepted == false);
+            if(propTheses == null)
+            {
+                throw new NotFoundException("Proposed theses not found");
+            }
+            var result = mapper.Map<List<ProposedThesisDto>>(propTheses);
+            return result;
+        }
+
         public List<ProposedThesisDto> GetAllFromDepartment(int departmentId)
         {
             var department = departmentService.GetById(departmentId);

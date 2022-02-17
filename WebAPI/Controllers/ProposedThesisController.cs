@@ -76,6 +76,14 @@ namespace WebAPI.Controllers
             var acceptedId = proposedThesisService.Accept(departmentId, proposedThesisId);
             return Created($"api/department/{departmentId}/thesis/{acceptedId}", null);
         }
+        [HttpGet]
+        [Route("promoter")]
+        [Authorize(Roles = "Promoter, Student")]
+        public ActionResult<List<ProposedThesisDto>> GetAllByPromoter([FromRoute] int departmentId)
+        {
+            var theses = proposedThesisService.GetAddedByPromoters(departmentId);
+            return Ok(theses);
+        }
         
     }
 }
