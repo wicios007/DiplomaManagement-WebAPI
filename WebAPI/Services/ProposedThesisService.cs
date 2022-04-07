@@ -54,7 +54,7 @@ namespace WebAPI.Services
                 propThese.Student = (Student)user;
                 propThese.StudentId = user.Id;
                 propThese.Promoter = null;
-                propThese.StudentId = null;
+                propThese.PromoterId = null;
             }
             else
             {

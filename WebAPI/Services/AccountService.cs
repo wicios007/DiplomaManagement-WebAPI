@@ -168,8 +168,6 @@ namespace WebAPI.Services
 
         public async Task<LoginReturn> Login(LoginUserDto dto)
         {
-
-
             if (dto is null)
             {
                 _logger.LogInformation($"Model is invalid");
@@ -214,7 +212,6 @@ namespace WebAPI.Services
                 Id = userId
             };
             return response;
-
         }
 
         async public Task<List<UserDto>> GetUsers()
